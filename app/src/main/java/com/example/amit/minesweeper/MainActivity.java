@@ -1,11 +1,13 @@
 package com.example.amit.minesweeper;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner difficultySpinner = (Spinner) findViewById(R.id.difficulty_spinner);
+        final Spinner difficultySpinner = (Spinner) findViewById(R.id.difficulty_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulties_array,
                 android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -39,7 +41,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View view) {
                 // switch case to find level then start right activity
-                Toast.makeText(getApplicationContext(),"hi", Toast.LENGTH_LONG).show();
+                int difficulty = difficultySpinner.getSelectedItemPosition();
+
+
+
+                if(difficulty <= eDifficulty.INTERMEDIATE.ordinal()) {
+                    //start easy or intermediate mode
+                    Intent intent = new Intent(view.getContext(), EasyIntermediatePlayActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    //start hard mode
+                }
+                Toast.makeText(getApplicationContext(),"hi", Toast.LENGTH_LONG).show(); // this still gets executed after the activity is changed
             }
         });
 
