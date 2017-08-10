@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary theme color of the app (sets background color of app bar) -->
+    <color name="colorPrimary">#B0BEC5</color>
+    <!-- Primary dark theme color of the app (sets color of status bar) -->
+    <color name="colorPrimaryDark">#90A4AE</color>
+
+    <!-- Background color of buttons in the app -->
+    <color name="colorButtonNormal">#546E7A</color>
+
+    <color name="colorAccent">#B0BEC5</color>
+</resources>

@@ -1,0 +1,18 @@
+<resources>
+
+    <string name="app_name">MineSweeper</string>
+    <string name="choose_difficulty">Please choose difficulty:</string>
+    <string name="last_mode_played">Last difficulty played:</string>
+    <string name="screen_size">Screen size:</string>
+    <string name="num_mines">Number of mines:</string>
+    <string name="start_game">Start!</string>
+
+    <string-array name="difficulties_array">
+
+        <item>Easy</item>
+        <item>Intermediate</item>
+        <item>Hard</item>
+
+    </string-array>
+
+</resources>
