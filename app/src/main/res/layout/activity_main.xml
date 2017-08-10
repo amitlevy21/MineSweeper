@@ -26,11 +26,12 @@
     </Spinner>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_below="@id/difficulty_spinner"
         android:layout_marginTop="16dp">
+
 
         <TextView
             android:id="@+id/screen_size"
@@ -58,12 +59,13 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/button_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/start_game"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:textColor="#FFFFFFFF"/>
+        android:textColor="#FFFFFFFF" />
 
 
 </android.widget.RelativeLayout>
