@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EASY, INTERMEDIATE, HARD
     }
 
-    public static final int[] SCREEN_SIZE = {10, 10, 5 };
+    public static final int[] SCREEN_SIZE = {10, 10, 5};
     public static final int[] NUM_OF_MINES = {5, 10, 10};
 
     @Override
@@ -36,27 +35,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         difficultySpinner.setOnItemSelectedListener(this);
 
         Button start = (Button) findViewById(R.id.button_start);
-        //get difficulty level selected
+
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // switch case to find level then start right activity
+                //get difficulty level selected
                 int difficulty = difficultySpinner.getSelectedItemPosition();
+                eDifficulty[] difficulties = eDifficulty.values();
 
+                Intent intent = new Intent(view.getContext(), PlayActivity.class);
 
+                intent.putExtra(Keys.DIFFICULTY, difficulties[difficulty]);
+                intent.putExtra(Keys.SCREEN_SIZE, SCREEN_SIZE[difficulty]);
+                intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
+                startActivity(intent);
 
-                if(difficulty <= eDifficulty.INTERMEDIATE.ordinal()) {
-                    //start easy or intermediate mode
-                    Intent intent = new Intent(view.getContext(), EasyIntermediatePlayActivity.class);
-                    intent.putExtra(Keys.DIFFICULTY, difficulty);
-                    intent.putExtra(Keys.SCREEN_SIZE, SCREEN_SIZE[difficulty]);
-                    intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
-                    startActivity(intent);
-                }
-                else {
-                    //start hard mode
-                }
-                Toast.makeText(getApplicationContext(),"hi", Toast.LENGTH_LONG).show(); // this still gets executed after the activity is changed
             }
         });
 
@@ -64,8 +57,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-        eDifficulty[] difficulties = eDifficulty.values();
 
         adapterView.setSelection(i);
 
