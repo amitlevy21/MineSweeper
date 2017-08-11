@@ -9,6 +9,7 @@
     <string name="score">Score:</string>
     <string name="flags">Flags:</string>
     <string name="quit">Quit</string>
+    <string name="result">Result:</string>
 
     <string-array name="difficulties_array">
 

@@ -1,6 +1,5 @@
 package com.example.amit.minesweeper;
 
-import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,14 +7,14 @@ import android.view.Display;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
-public class EasyIntermediatePlayActivity extends AppCompatActivity {
+public class PlayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_easy_intermediate_play);
+        setContentView(R.layout.activity_play);
         Bundle bundle = getIntent().getExtras();
-        int difficulty = bundle.getInt(Keys.DIFFICULTY);
+        MainActivity.eDifficulty difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
         int numOfMines = bundle.getInt(Keys.NUM_OF_MINES);
         int screenSize = bundle.getInt(Keys.SCREEN_SIZE);
 
