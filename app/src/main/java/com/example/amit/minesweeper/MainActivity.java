@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EASY, INTERMEDIATE, HARD
     }
 
-    public static final String[] SCREEN_SIZE = {"10 X 10", "10 X 10", "5 X 5"};
+    public static final int[] SCREEN_SIZE = {10, 10, 5 };
     public static final int[] NUM_OF_MINES = {5, 10, 10};
 
     @Override
@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if(difficulty <= eDifficulty.INTERMEDIATE.ordinal()) {
                     //start easy or intermediate mode
                     Intent intent = new Intent(view.getContext(), EasyIntermediatePlayActivity.class);
+                    intent.putExtra(Keys.DIFFICULTY, difficulty);
+                    intent.putExtra(Keys.SCREEN_SIZE, SCREEN_SIZE[difficulty]);
+                    intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
                     startActivity(intent);
                 }
                 else {
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adapterView.setSelection(i);
 
         TextView screenSize = (TextView) findViewById(R.id.screen_size);
-        screenSize.setText(getString(R.string.screen_size) + " " + SCREEN_SIZE[i]);
+        screenSize.setText(getString(R.string.screen_size) + " " + SCREEN_SIZE[i] + " X " + SCREEN_SIZE[i]);
 
         TextView numOfMines = (TextView) findViewById(R.id.num_mines);
         numOfMines.setText(getString(R.string.num_mines) + " " + NUM_OF_MINES[i]);
