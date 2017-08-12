@@ -26,14 +26,14 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:text="@string/num_of_blocks"
+        android:text="@string/num_of_correct_cubes"
         android:textSize="@dimen/text_default"
         android:layout_weight="2" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:text="Number of good flags: "
+        android:text="@string/num_of_correct_flags"
         android:textSize="@dimen/text_default"
         android:layout_weight="2" />
 
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="try again?"
+            android:text="@string/try_again"
             android:textColor="#FFFFFFFF" />
     </RelativeLayout>
 

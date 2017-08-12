@@ -11,7 +11,9 @@
     <string name="quit">Quit</string>
     <string name="result">Result:</string>
     <string name="time">Time:</string>
-    <string name="num_of_blocks">Number of blocks:</string>
+    <string name="num_of_correct_cubes">Number of correct cubes:</string>
+    <string name="num_of_correct_flags">Number of correct flags:</string>
+    <string name="try_again">Try Again?</string>
     <string-array name="difficulties_array">
 
         <item>Easy</item>
