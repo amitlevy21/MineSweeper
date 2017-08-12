@@ -26,7 +26,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:text="@string/num_of_blocks1"
+        android:text="@string/num_of_blocks"
         android:textSize="@dimen/text_default"
         android:layout_weight="2" />
 
