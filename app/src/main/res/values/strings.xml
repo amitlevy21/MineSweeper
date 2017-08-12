@@ -10,7 +10,8 @@
     <string name="flags">Flags:</string>
     <string name="quit">Quit</string>
     <string name="result">Result:</string>
-
+    <string name="time">Time:</string>
+    <string name="num_of_blocks">Number of blocks:</string>
     <string-array name="difficulties_array">
 
         <item>Easy</item>
