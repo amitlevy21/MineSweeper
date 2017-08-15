@@ -7,7 +7,10 @@ import android.view.Display;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+
 public class PlayActivity extends AppCompatActivity {
+
+    public static final int FRACTION = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +31,15 @@ public class PlayActivity extends AppCompatActivity {
         int width = size.x;
         int height = size.y;
 
+        int theSmallerAxis = height < width ? height : width;
+        int buttonWidth = theSmallerAxis / FRACTION;
+
         for (int i = 0; i < screenSize; i++) {
             for (int j = 0; j < screenSize; j++) {
+
+
+                //Block c = new Block(this, buttonWidth, buttonWidth, buttonWidth, buttonWidth)
+
                 TextView text = new TextView(this);
                 text.setText("HI");
                 grid.addView(text);
