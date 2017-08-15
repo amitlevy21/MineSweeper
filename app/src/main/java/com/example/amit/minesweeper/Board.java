@@ -1,39 +1,39 @@
 package com.example.amit.minesweeper;
 
-import android.content.Context;
-import android.graphics.Point;
-import android.view.Display;
-import android.view.View;
 import android.widget.GridLayout;
 
 
-public class Board extends GridLayout {
+
+public class Board  {
+
+    public static final int MAX_NUM_OF_MINES_AROUND_BLOCK = 4;
 
     private static Board instance = null;
     private Block[] blocks;
-    private int numOfBlocks;
+    private int totalNumOfBlocks;
+    private int currentNumOfBlocks;
+    private GridLayout gridLayout;
 
-    public static Board getInstance(Context context, int numOfBlocks) {
+    public static Board getInstance( GridLayout gridLayout, int totalNumOfBlocks) {
         if(instance == null) {
-            instance = new Board(context, numOfBlocks);
+            instance = new Board(gridLayout, totalNumOfBlocks);
         }
         return instance;
     }
 
-    private Board(Context context, int numOfBlocks) {
-        super(context);
-        this.numOfBlocks = numOfBlocks;
+    private Board(GridLayout gridLayout, int numOfBlocks) {
+        this.totalNumOfBlocks = numOfBlocks;
         blocks = new Block[numOfBlocks];
-        Display display = PlayActivity.getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
-        int height = size.y;
+        this.gridLayout = gridLayout;
 
     }
 
-    public boolean addBlock() {
-
+    public boolean addBlock(Block block) {
+        if(currentNumOfBlocks >= gridLayout.getRowCount() * gridLayout.getColumnCount())
+            return false;
+        blocks[currentNumOfBlocks] = block;
+        currentNumOfBlocks++;
+        gridLayout.addView(block);
         return true;
     }
 
@@ -41,12 +41,12 @@ public class Board extends GridLayout {
         return blocks;
     }
 
-    public int getNumOfBlocks() {
-        return numOfBlocks;
+    public int getTotalNumOfBlocks() {
+        return totalNumOfBlocks;
     }
     
     public void rebuild(int numOfBlocks) {
-        this.numOfBlocks = numOfBlocks;
+        this.totalNumOfBlocks = numOfBlocks;
         blocks = new Block[numOfBlocks];
     }
 }

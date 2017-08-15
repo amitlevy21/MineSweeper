@@ -2,33 +2,27 @@ package com.example.amit.minesweeper;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.view.View;
+import android.support.v7.widget.AppCompatButton;
+import android.view.ViewGroup;
 
 
-public class Block extends View{
+public class Block extends AppCompatButton{
 
-    public enum eContains {
-        EMPTY, NUMBER, MINE
-    }
 
-    private eContains content;
     private boolean isPressed = false;
     private boolean isFlagged = false;
+    private boolean hasMine = true;
+
+
+
     private int numOfMinesAround;
 
-    public Block(Context context, int left, int top, int right, int bottom,
-                 int numOfMinesAround, eContains content) {
+    public Block(Context context, int size, int numOfMinesAround) {
 
         super(context);
-        layout(left,top,right,bottom);
-
+        setLayoutParams(new ViewGroup.LayoutParams(size,size));
         setBackgroundColor(Color.LTGRAY);
         this.numOfMinesAround = numOfMinesAround;
-        this.content = content;
-    }
-
-    public eContains getContent() {
-        return content;
     }
 
     public boolean getIsPressed() { // do not override isPressed by View class
@@ -41,6 +35,10 @@ public class Block extends View{
 
     public int getNumOfMinesAround() {
         return numOfMinesAround;
+    }
+
+    public boolean hasMine() {
+        return hasMine;
     }
 
     public void press() {
