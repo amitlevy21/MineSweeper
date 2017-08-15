@@ -50,6 +50,7 @@
             android:textSize="@dimen/text_default" />
 
         <TextView
+            android:id="@+id/last_mode_played"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:text="@string/last_mode_played"
