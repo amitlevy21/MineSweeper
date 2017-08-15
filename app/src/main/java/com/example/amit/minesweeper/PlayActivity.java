@@ -21,6 +21,10 @@ public class PlayActivity extends AppCompatActivity {
         int numOfMines = bundle.getInt(Keys.NUM_OF_MINES);
         int screenSize = bundle.getInt(Keys.SCREEN_SIZE);
 
+        Board board = Board.getInstance(getApplicationContext(), screenSize);
+        board.setRowCount(screenSize);
+        board.setColumnCount(screenSize);
+
         GridLayout grid = (GridLayout) findViewById(R.id.grid);
         grid.setRowCount(screenSize);
         grid.setColumnCount(screenSize);
