@@ -34,7 +34,7 @@ public class PlayActivity extends AppCompatActivity {
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-
+//change
         int theSmallerAxis = height < width ? height : width;
         int buttonWidth = theSmallerAxis / FRACTION;
 
