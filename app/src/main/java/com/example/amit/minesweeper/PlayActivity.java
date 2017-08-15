@@ -4,8 +4,9 @@ import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
-import android.widget.TextView;
+
 
 
 public class PlayActivity extends AppCompatActivity {
@@ -21,34 +22,29 @@ public class PlayActivity extends AppCompatActivity {
         int numOfMines = bundle.getInt(Keys.NUM_OF_MINES);
         int screenSize = bundle.getInt(Keys.SCREEN_SIZE);
 
-        Board board = Board.getInstance(getApplicationContext(), screenSize);
-        board.setRowCount(screenSize);
-        board.setColumnCount(screenSize);
-
-        GridLayout grid = (GridLayout) findViewById(R.id.grid);
-        grid.setRowCount(screenSize);
-        grid.setColumnCount(screenSize);
-
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-//change
         int theSmallerAxis = height < width ? height : width;
         int buttonWidth = theSmallerAxis / FRACTION;
 
-        for (int i = 0; i < screenSize; i++) {
-            for (int j = 0; j < screenSize; j++) {
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
+
+        Board board = Board.getInstance(gridLayout, screenSize*screenSize);
+
+        gridLayout.setRowCount(screenSize);
+        gridLayout.setColumnCount(screenSize);
 
 
-                //Block c = new Block(this, buttonWidth, buttonWidth, buttonWidth, buttonWidth)
 
-                TextView text = new TextView(this);
-                text.setText("HI");
-                grid.addView(text);
-            }
+        for (int i = 0; i < screenSize * screenSize; i++) {
+            Block block = new Block(this, buttonWidth, buttonWidth);
+            block.setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
+            board.addBlock(block);
         }
-        grid.invalidate();
+
+        //change
     }
 }
