@@ -37,5 +37,4 @@ public class EndGameActivity extends AppCompatActivity {
             }
         });
     }
-    //test
 }
