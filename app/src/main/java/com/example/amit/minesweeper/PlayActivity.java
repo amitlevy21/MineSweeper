@@ -25,7 +25,7 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        final String time = "time";
+
         final long startTime = System.currentTimeMillis();
 
         Button quit = (Button) findViewById(R.id.button_quit);
@@ -40,7 +40,7 @@ public class PlayActivity extends AppCompatActivity {
 
                 won = false;
                 intent.putExtra(Keys.RESULT, won);
-                intent.putExtra(time, difference);
+                intent.putExtra(Keys.TIME, difference);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
                 finish();
