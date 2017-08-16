@@ -13,18 +13,16 @@ import android.widget.GridLayout;
 
 public class PlayActivity extends AppCompatActivity {
 
-    public static final int FRACTION = 5;
-    boolean won;
+    public static final int BIGGER_FRACTION = 6;
+    public static final int SMALLER_FRACTION = 11;
+
+    private boolean won;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-        Bundle bundle = getIntent().getExtras();
-        final MainActivity.eDifficulty difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
-        int numOfMines = bundle.getInt(Keys.NUM_OF_MINES);
-        int screenSize = bundle.getInt(Keys.SCREEN_SIZE);
-        final String result = "result";
+
 
 
         Button quit = (Button) findViewById(R.id.button_quit);
@@ -36,13 +34,23 @@ public class PlayActivity extends AppCompatActivity {
                 Intent intent = new Intent(view.getContext(), EndGameActivity.class);
 
                 won = false;
-                intent.putExtra(result, won);
-
+                intent.putExtra(Keys.RESULT, won);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
+                finish();
 
             }
         });
+        buildBoard();
 
+    }
+
+    public void buildBoard() {
+
+        Bundle bundle = getIntent().getExtras();
+        MainActivity.eDifficulty difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
+        int numOfMines = bundle.getInt(Keys.NUM_OF_MINES);
+        int boardSize = bundle.getInt(Keys.BOARD_SIZE);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -50,24 +58,20 @@ public class PlayActivity extends AppCompatActivity {
         int width = size.x;
         int height = size.y;
 
+        int fraction;
+
+        if(difficulty.ordinal() <= MainActivity.eDifficulty.INTERMEDIATE.ordinal())
+            fraction = SMALLER_FRACTION;
+        else
+            fraction = BIGGER_FRACTION;
+
+
         int theSmallerAxis = height < width ? height : width;
-        int buttonWidth = theSmallerAxis / FRACTION;
+        int buttonWidth = theSmallerAxis / fraction;
 
         GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
 
-        Board board = Board.getInstance(gridLayout, screenSize*screenSize);
-
-        gridLayout.setRowCount(screenSize);
-        gridLayout.setColumnCount(screenSize);
-
-
-
-        for (int i = 0; i < screenSize * screenSize; i++) {
-            Block block = new Block(this, buttonWidth, buttonWidth);
-            block.setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
-            board.addBlock(block);
-        }
-
+        Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth);
 
     }
 }

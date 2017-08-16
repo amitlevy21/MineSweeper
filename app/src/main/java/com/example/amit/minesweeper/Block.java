@@ -12,17 +12,14 @@ public class Block extends AppCompatButton{
     private boolean isPressed = false;
     private boolean isFlagged = false;
     private boolean hasMine = true;
-
-
-
     private int numOfMinesAround;
 
-    public Block(Context context, int size, int numOfMinesAround) {
+    public Block(Context context, int size) {
 
         super(context);
         setLayoutParams(new ViewGroup.LayoutParams(size,size));
         setBackgroundColor(Color.LTGRAY);
-        this.numOfMinesAround = numOfMinesAround;
+
     }
 
     public boolean getIsPressed() { // do not override isPressed by View class

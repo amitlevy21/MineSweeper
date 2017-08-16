@@ -31,15 +31,6 @@
 
     </LinearLayout>
 
-    <GridLayout
-        android:id="@+id/grid"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/headline_layout"
-        android:layout_margin="32dp">
-
-    </GridLayout>
-
     <Button
         android:id="@+id/button_quit"
         android:layout_width="wrap_content"
@@ -47,7 +38,18 @@
         android:text="@string/quit"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:textColor="#FFFFFFFF"/>
+        android:textColor="#FFFFFFFF" />
+
+    <GridLayout
+        android:id="@+id/grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button_quit"
+        android:layout_below="@id/headline_layout"
+        android:layout_margin="@dimen/margin_default">
+
+
+    </GridLayout>
 
 
 </RelativeLayout>

@@ -34,7 +34,7 @@
 
 
         <TextView
-            android:id="@+id/screen_size"
+            android:id="@+id/board_size"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
