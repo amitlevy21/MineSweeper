@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 
+import java.util.Timer;
+
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -23,7 +25,8 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-
+        final String time = "time";
+        final long startTime = System.currentTimeMillis();
 
         Button quit = (Button) findViewById(R.id.button_quit);
 
@@ -33,8 +36,11 @@ public class PlayActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(view.getContext(), EndGameActivity.class);
 
+                long difference = System.currentTimeMillis() - startTime;
+
                 won = false;
                 intent.putExtra(Keys.RESULT, won);
+                intent.putExtra(time, difference);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
                 finish();
