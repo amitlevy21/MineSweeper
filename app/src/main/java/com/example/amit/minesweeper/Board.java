@@ -15,28 +15,46 @@ public class Board  {
     private int totalNumOfBlocks;
     private int currentNumOfBlocks;
     private GridLayout gridLayout;
-    private int numOfFlagsAllowed;
+    private int numOfFlags;
 
 
     public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth) {
         this.totalNumOfBlocks = boardSize*boardSize;
-        blocks = new Block[boardSize*boardSize];
+        blocks = new Block[totalNumOfBlocks];
         this.gridLayout = gridLayout;
         this.gridLayout.setRowCount(boardSize);
         this.gridLayout.setColumnCount(boardSize);
 
-        for (int i = 0; i < totalNumOfBlocks; i++) {
-            blocks[i] = new Block(context, buttonWidth);
-            blocks[i].setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
-            addBlock(blocks[i]);
-            blocks[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        createBlocks(context, boardSize, buttonWidth);
 
-                }
-            });
+    }
+
+    private void createBlocks(Context context,int boardSize, int buttonWidth) {
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                blocks[i * boardSize + j] = new Block(context, buttonWidth, i, j);
+                blocks[i * boardSize + j].setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
+                blocks[i * boardSize + j].setLongClickable(true);
+                addBlock(blocks[i * boardSize + j]);
+                blocks[i * boardSize + j].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Block block = (Block) view;
+                        block.press();
+                    }
+                });
+                blocks[i * boardSize + j].setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        Block block = (Block) view;
+                        block.markFlag();
+                        numOfFlags++;
+                        return true;
+                    }
+                });
+            }
+
         }
-
     }
 
     public boolean addBlock(Block block) {

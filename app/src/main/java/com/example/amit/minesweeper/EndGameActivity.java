@@ -15,7 +15,7 @@ public class EndGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_end_game);
 
         Bundle bundle = getIntent().getExtras();
-        boolean result = (boolean) bundle.getSerializable("result");
+        boolean result = (boolean) bundle.getSerializable(Keys.RESULT);
         Button tryAgain = (Button) findViewById(R.id.try_again);
 
         if (result) {
