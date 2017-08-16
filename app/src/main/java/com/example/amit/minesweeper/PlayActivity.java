@@ -45,6 +45,6 @@ public class PlayActivity extends AppCompatActivity {
             board.addBlock(block);
         }
 
-        //change
+
     }
 }
