@@ -16,6 +16,7 @@ public class EndGameActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         boolean result = (boolean) bundle.getSerializable(Keys.RESULT);
+        long timeToShow = ((long) bundle.getSerializable("time"))/1000;
         Button tryAgain = (Button) findViewById(R.id.try_again);
 
         if (result) {
@@ -25,6 +26,8 @@ public class EndGameActivity extends AppCompatActivity {
             TextView textResult = (TextView) findViewById(R.id.result);
             textResult.setText(getString(R.string.result) + " you have lost");
         }
+            TextView textTime = (TextView) findViewById(R.id.time);
+        textTime.setText(getString(R.string.time) + " " + timeToShow + " sec");
 
         tryAgain.setOnClickListener(new View.OnClickListener() {
             @Override
