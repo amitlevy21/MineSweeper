@@ -3,6 +3,7 @@ package com.example.amit.minesweeper;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public enum eDifficulty {
         EASY, INTERMEDIATE, HARD
     }
+
+    static boolean played = false;
+    static String showDifucllty;
 
     public static final int[] SCREEN_SIZE = {10, 10, 5};
     public static final int[] NUM_OF_MINES = {5, 10, 10};
@@ -44,15 +48,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 eDifficulty[] difficulties = eDifficulty.values();
 
                 Intent intent = new Intent(view.getContext(), PlayActivity.class);
-
                 intent.putExtra(Keys.DIFFICULTY, difficulties[difficulty]);
                 intent.putExtra(Keys.SCREEN_SIZE, SCREEN_SIZE[difficulty]);
                 intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
+
+                showDifucllty = difficulties[difficulty].toString();
+                played = true;
                 startActivity(intent);
 
             }
         });
 
+        if (played) {
+            afterPlayedView();
+        }
     }
 
     @Override
@@ -73,4 +82,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         adapterView.setSelection(0);
     }
+
+    public void afterPlayedView() {
+        TextView difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
+        difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifucllty);
+    }
+
 }
