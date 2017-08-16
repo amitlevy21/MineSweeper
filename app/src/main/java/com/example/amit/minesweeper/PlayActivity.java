@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
-import android.widget.TextView;
 
 
 public class PlayActivity extends AppCompatActivity {
@@ -26,9 +26,6 @@ public class PlayActivity extends AppCompatActivity {
         int screenSize = bundle.getInt(Keys.SCREEN_SIZE);
         final String result = "result";
 
-        GridLayout grid = (GridLayout) findViewById(R.id.grid);
-        grid.setRowCount(screenSize);
-        grid.setColumnCount(screenSize);
 
         Button quit = (Button) findViewById(R.id.button_quit);
 
@@ -56,17 +53,21 @@ public class PlayActivity extends AppCompatActivity {
         int theSmallerAxis = height < width ? height : width;
         int buttonWidth = theSmallerAxis / FRACTION;
 
-        for (int i = 0; i < screenSize; i++) {
-            for (int j = 0; j < screenSize; j++) {
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
+
+        Board board = Board.getInstance(gridLayout, screenSize*screenSize);
+
+        gridLayout.setRowCount(screenSize);
+        gridLayout.setColumnCount(screenSize);
 
 
-                //Block c = new Block(this, buttonWidth, buttonWidth, buttonWidth, buttonWidth)
 
-                TextView text = new TextView(this);
-                text.setText("HI");
-                grid.addView(text);
-            }
+        for (int i = 0; i < screenSize * screenSize; i++) {
+            Block block = new Block(this, buttonWidth, buttonWidth);
+            block.setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
+            board.addBlock(block);
         }
-        grid.invalidate();
+
+
     }
 }
