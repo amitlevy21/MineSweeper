@@ -33,13 +33,20 @@ public class Board  {
         this.numOfMines = numOfMines;
 
         createBlocks(context, boardSize, buttonWidth);
-        setMines(pickRandom(numOfMines,boardSize), pickRandom(numOfMines,boardSize));
+        setMines(pickRandom(numOfMines,blocks.length - 1), pickRandom(numOfMines,blocks.length - 1));
+
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[i].length; j++) {
+                int mines = numOfMinesAround(i, j);
+                blocks[i][j].setNumOfMinesAround(mines);
+            }
+        }
     }
 
     private void createBlocks(Context context,int boardSize, int buttonWidth) {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                blocks[i][j] = new Block(context, buttonWidth, i, j);
+                blocks[i][j] = new Block(context, i, j, buttonWidth);
                 blocks[i][j].setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
                 blocks[i][j].setLongClickable(true);
                 addBlock(blocks[i][j], i, j);
@@ -47,8 +54,12 @@ public class Board  {
                     @Override
                     public void onClick(View view) {
                         Block block = (Block) view;
-                        if(block.press())
-                            minePressed = true;
+                        if(block.getNumOfMinesAround() == 0) {
+                            pressBlockAndNeighbours(block.getRow(), block.getCol());
+                        }else {
+                            block.press();
+                        }
+
                     }
                 });
                 blocks[i][j].setOnLongClickListener(new View.OnLongClickListener() {
@@ -80,6 +91,32 @@ public class Board  {
 
         while(itRow.hasNext() && itCol.hasNext()) {
             blocks[itRow.next()][itCol.next()].setHasMine(true);
+        }
+    }
+
+    private int numOfMinesAround(int row, int col){
+        int mines = 0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) continue;
+                if (row + i < 0 || row + i >= blocks.length) continue;
+                if (col + j < 0 || col + j >= blocks[0].length) continue;
+                if (blocks[row+i][col+j].hasMine())
+                    mines++;
+            }
+        }
+        return mines;
+    }
+
+    private void pressBlockAndNeighbours(int row, int col) {
+        if (col < 0 || col >= blocks[0].length || row < 0 || row >= blocks.length) return;
+
+        if (blocks[row][col].getNumOfMinesAround() == 0 && !blocks[row][col].getIsPressed()) {
+            blocks[row][col].press();
+            pressBlockAndNeighbours(row, col + 1);
+            pressBlockAndNeighbours(row, col - 1);
+            pressBlockAndNeighbours(row - 1, col);
+            pressBlockAndNeighbours(row + 1, col);
         }
     }
 

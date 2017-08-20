@@ -27,7 +27,7 @@ public class EndGameActivity extends AppCompatActivity {
             textResult.setText(getString(R.string.result) + " " + getString(R.string.lost_text));
         }
             TextView textTime = (TextView) findViewById(R.id.time);
-            textTime.setText(getString(R.string.time) + " " + timeToShow + " sec");
+            textTime.setText(getString(R.string.end_activity_time) + " " + timeToShow + " sec");
 
         tryAgain.setOnClickListener(new View.OnClickListener() {
             @Override

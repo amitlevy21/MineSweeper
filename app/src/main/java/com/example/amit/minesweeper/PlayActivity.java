@@ -55,6 +55,15 @@ public class PlayActivity extends AppCompatActivity {
         int numOfMines = bundle.getInt(Keys.NUM_OF_MINES);
         int boardSize = bundle.getInt(Keys.BOARD_SIZE);
 
+        int buttonWidth = calculateButtonSize(difficulty);
+
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
+
+        Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth, numOfMines);
+
+    }
+
+    public int calculateButtonSize(MainActivity.eDifficulty difficulty) {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -63,20 +72,13 @@ public class PlayActivity extends AppCompatActivity {
 
         int fraction;
 
-        if(difficulty.ordinal() <= MainActivity.eDifficulty.INTERMEDIATE.ordinal())
+        if (difficulty.ordinal() <= MainActivity.eDifficulty.INTERMEDIATE.ordinal())
             fraction = SMALLER_FRACTION;
         else
             fraction = BIGGER_FRACTION;
 
-
         int theSmallerAxis = height < width ? height : width;
-        int buttonWidth = theSmallerAxis / fraction;
-
-        GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
-
-        Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth, numOfMines);
-
+        return theSmallerAxis / fraction;
     }
-
 
 }

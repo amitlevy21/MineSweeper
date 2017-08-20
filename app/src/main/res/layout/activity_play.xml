@@ -51,5 +51,14 @@
 
     </GridLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/button_quit"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/margin_default"
+        android:textSize="@dimen/text_default"
+        android:text="@string/play_activity_time"/>
+
 
 </RelativeLayout>

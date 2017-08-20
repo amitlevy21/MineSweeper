@@ -43,6 +43,10 @@ public class Block extends AppCompatButton{
         return numOfMinesAround;
     }
 
+    public void setNumOfMinesAround(int numOfMinesAround) {
+        this.numOfMinesAround = numOfMinesAround;
+    }
+
     public boolean hasMine() {
         return hasMine;
     }
@@ -56,7 +60,8 @@ public class Block extends AppCompatButton{
                     setBackgroundColor(Color.RED);
                     return true;
                 } else {
-                    setBackgroundColor(Color.BLUE);
+                    setText(String.valueOf(numOfMinesAround));
+                    //setBackgroundColor(Color.BLUE);
                     return false;
                 }
             }

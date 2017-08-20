@@ -10,12 +10,13 @@
     <string name="flags">Flags:</string>
     <string name="quit">Quit</string>
     <string name="result">Result:</string>
-    <string name="time">Time:</string>
+    <string name="end_activity_time">Time:</string>
     <string name="num_of_correct_cubes">Number of correct cubes:</string>
     <string name="num_of_correct_flags">Number of correct flags:</string>
     <string name="try_again">Try Again?</string>
     <string name="lost_text">you have lost</string>
     <string name="won_text">you have won</string>
+    <string name="play_activity_time">Time:</string>
     <string-array name="difficulties_array">
 
         <item>Easy</item>
