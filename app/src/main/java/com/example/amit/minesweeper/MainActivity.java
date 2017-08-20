@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     static boolean played = false;
-    static String showDifucllty;
+    static String showDifficulty;
 
     public static final int[] BOARD_SIZE = {10, 10, 5};
     public static final int[] NUM_OF_MINES = {5, 10, 10};
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 intent.putExtra(Keys.BOARD_SIZE, BOARD_SIZE[difficulty]);
                 intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
 
-                showDifucllty = difficulties[difficulty].toString();
+                showDifficulty = difficulties[difficulty].toString();
                 played = true;
                 startActivity(intent);
 
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void afterPlayedView() {
         TextView difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
-        difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifucllty);
+        difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifficulty);
     }
 
 }
