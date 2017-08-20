@@ -61,7 +61,7 @@ public class Block extends AppCompatButton{
                     return true;
                 } else {
                     setText(String.valueOf(numOfMinesAround));
-                    //setBackgroundColor(Color.BLUE);
+
                     return false;
                 }
             }

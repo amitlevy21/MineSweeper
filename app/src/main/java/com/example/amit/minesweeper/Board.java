@@ -5,10 +5,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
+
 
 
 public class Board  {
@@ -33,7 +34,7 @@ public class Board  {
         this.numOfMines = numOfMines;
 
         createBlocks(context, boardSize, buttonWidth);
-        setMines(pickRandom(numOfMines,blocks.length - 1), pickRandom(numOfMines,blocks.length - 1));
+        setMines();
 
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[i].length; j++) {
@@ -85,13 +86,25 @@ public class Board  {
         return true;
     }
 
-    private void setMines(Set<Integer> rows, Set<Integer> cols) {
-        Iterator<Integer> itRow = rows.iterator();
-        Iterator<Integer> itCol = cols.iterator();
+    private void setMines() {
+        final Random rnd = new Random();
+        final int N = blocks.length * blocks[0].length;
+        final int K = numOfMines;
+        final List<Integer> S = new ArrayList<>(N);
 
-        while(itRow.hasNext() && itCol.hasNext()) {
-            blocks[itRow.next()][itCol.next()].setHasMine(true);
+        for (int i = 0; i < N; i++) {
+            S.add(i);
         }
+
+        Collections.shuffle(S, rnd);
+        List<Integer> rows = new ArrayList<>(S);
+        Collections.shuffle(S,rnd);
+        List<Integer> cols = new ArrayList<>(S);
+
+        for (int i = 0; i < K; i++) {
+            blocks[rows.get(i) % (blocks.length - 1)][cols.get(i) % (blocks[0].length - 1)].setHasMine(true);
+        }
+
     }
 
     private int numOfMinesAround(int row, int col){
@@ -120,13 +133,5 @@ public class Board  {
         }
     }
 
-    public Set<Integer> pickRandom(int numbers, int range) {
-        final Random RANDOM = new Random();
-        final Set<Integer> picked = new HashSet<>();
-        while (picked.size() < numbers) {
-            picked.add(RANDOM.nextInt(range + 1));
-        }
-        return picked;
-    }
 
 }
