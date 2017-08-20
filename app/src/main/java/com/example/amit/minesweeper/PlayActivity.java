@@ -7,10 +7,8 @@ import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
-import android.view.ViewGroup;
 import android.widget.GridLayout;
 
-import java.util.Timer;
 
 
 public class PlayActivity extends AppCompatActivity {
@@ -48,7 +46,6 @@ public class PlayActivity extends AppCompatActivity {
             }
         });
         buildBoard();
-//change
     }
 
     public void buildBoard() {
@@ -77,7 +74,9 @@ public class PlayActivity extends AppCompatActivity {
 
         GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
 
-        Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth);
+        Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth, numOfMines);
 
     }
+
+
 }

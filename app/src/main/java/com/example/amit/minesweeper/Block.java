@@ -47,29 +47,36 @@ public class Block extends AppCompatButton{
         return hasMine;
     }
 
+    /** Returns true if the player has clicked a mine, false otherwise */
     public boolean press() {
-        if(!isPressed) {
-            isPressed = true;
-            if(hasMine) {
-                setBackgroundColor(Color.RED);
-                return false;
-            }
-            else {
-                setBackgroundColor(Color.BLUE);
-                return true;
+        if(!isFlagged) {
+            if (!isPressed) {
+                isPressed = true;
+                if (hasMine) {
+                    setBackgroundColor(Color.RED);
+                    return true;
+                } else {
+                    setBackgroundColor(Color.BLUE);
+                    return false;
+                }
             }
         }
-        return true;
+        return false;
     }
 
     public void markFlag() {
-        if(!isFlagged) {
-            setText("F");
-            isFlagged = true;
+        if (!isPressed) {
+            if (!isFlagged) {
+                setText("F");
+                isFlagged = true;
+            } else {
+                setText("");
+                isFlagged = false;
+            }
         }
-        else {
-            setText("");
-            isFlagged = false;
-        }
+    }
+
+    public void setHasMine(boolean hasMine) {
+        this.hasMine = hasMine;
     }
 }
