@@ -8,7 +8,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
-
+import android.widget.TextView;
 
 
 public class PlayActivity extends AppCompatActivity {
@@ -17,13 +17,28 @@ public class PlayActivity extends AppCompatActivity {
     public static final int SMALLER_FRACTION = 11;
 
     private boolean won;
+    private int minutes = 0;
+
+    TimeCounter timer = new TimeCounter(300000000) {
+        public void onTick(int second) {
+            if(second%60 == 0 &&second >0)
+                minutes++;
+            TextView textTime = (TextView) findViewById(R.id.timer);
+            if((second%60)/10 == 0)
+                textTime.setText(getString(R.string.play_activity_time) + " " +minutes + ":0" + String.valueOf(second%60));
+            else
+                textTime.setText(getString(R.string.play_activity_time) + " " +minutes + ":" + String.valueOf(second%60));
+        }
+    };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-
+        timer.start();
         final long startTime = System.currentTimeMillis();
 
         Button quit = (Button) findViewById(R.id.button_quit);
@@ -63,6 +78,7 @@ public class PlayActivity extends AppCompatActivity {
 
     }
 
+
     public int calculateButtonSize(MainActivity.eDifficulty difficulty) {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -80,5 +96,6 @@ public class PlayActivity extends AppCompatActivity {
         int theSmallerAxis = height < width ? height : width;
         return theSmallerAxis / fraction;
     }
+
 
 }

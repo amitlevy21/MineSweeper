@@ -52,11 +52,12 @@
     </GridLayout>
 
     <TextView
+        android:id="@+id/timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/button_quit"
         android:layout_centerInParent="true"
-        android:layout_margin="@dimen/margin_default"
+        android:layout_margin="0dp"
         android:textSize="@dimen/text_default"
         android:text="@string/play_activity_time"/>
 

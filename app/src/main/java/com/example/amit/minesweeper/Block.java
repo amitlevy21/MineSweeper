@@ -61,7 +61,6 @@ public class Block extends AppCompatButton{
                     return true;
                 } else {
                     setText(String.valueOf(numOfMinesAround));
-
                     return false;
                 }
             }
