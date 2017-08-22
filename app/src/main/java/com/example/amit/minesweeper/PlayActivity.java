@@ -67,6 +67,8 @@ public class PlayActivity extends AppCompatActivity {
                 won = false;
                 intent.putExtra(Keys.RESULT, won);
                 intent.putExtra(Keys.TIME, difference);
+                int cubes = getUpdatedCubes();
+                intent.putExtra(Keys.GOOD_CUBES,cubes);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
                 finish();
@@ -114,20 +116,35 @@ public class PlayActivity extends AppCompatActivity {
 
 
     public void update(){
-        Block[][] blocks = board.getBlocks();
-        int flags = 0, cubes = 0;
-        for(int i = 0; i<blocks.length; i++){
-            for(int j = 0; j<blocks.length; j++){
-               if(blocks[i][j].getIsFlagged())
-                   flags++;
-                if(blocks[i][j].getIsPressed() && !(blocks[i][j].hasMine()))
-                    cubes++;
-            }
-        }
+
+        int flags = getUpdatedFlags();
+        int cubes = getUpdatedCubes();
 
         flagsOnPlay.setText(getString(R.string.flags) + " " +flags);
         CubesOnPlay.setText(getString(R.string.score) + " " +cubes);
 
+    }
+    public int getUpdatedFlags(){
+        Block[][] blocks = board.getBlocks();
+        int flags = 0;
+        for(int i = 0; i<blocks.length; i++) {
+            for (int j = 0; j < blocks.length; j++) {
+                if (blocks[i][j].getIsFlagged())
+                    flags++;
+            }
+        }
+        return flags;
+    }
+    public int getUpdatedCubes(){
+            Block[][] blocks = board.getBlocks();
+            int cubes = 0;
+            for(int i = 0; i<blocks.length; i++) {
+                for (int j = 0; j < blocks.length; j++) {
+                    if(blocks[i][j].getIsPressed() && !(blocks[i][j].hasMine()))
+                        cubes++;
+                }
+            }
+            return cubes;
     }
 
 }

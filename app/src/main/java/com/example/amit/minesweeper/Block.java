@@ -76,6 +76,7 @@ public class Block extends AppCompatButton{
             if (!isFlagged) {
                 //setBackgroundResource(R.);
                 isFlagged = true;
+                setText("F");
             } else {
                 setText("");
                 isFlagged = false;

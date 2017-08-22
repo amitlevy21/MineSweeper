@@ -17,6 +17,7 @@ public class EndGameActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         boolean result = (boolean) bundle.getSerializable(Keys.RESULT);
         long timeToShow = ((long) bundle.getSerializable(Keys.TIME))/1000;
+        int goodCubes = (int) bundle.getSerializable(Keys.GOOD_CUBES);
         Button tryAgain = (Button) findViewById(R.id.try_again);
 
         if (result) {
@@ -28,6 +29,9 @@ public class EndGameActivity extends AppCompatActivity {
         }
             TextView textTime = (TextView) findViewById(R.id.time);
             textTime.setText(getString(R.string.end_activity_time) + " " + timeToShow + " sec");
+
+            TextView numOfGoodFlags = (TextView) findViewById(R.id.num_of_good_flags);
+            numOfGoodFlags.setText(getString(R.string.num_of_correct_flags) + " " +goodCubes );
 
         tryAgain.setOnClickListener(new View.OnClickListener() {
             @Override
