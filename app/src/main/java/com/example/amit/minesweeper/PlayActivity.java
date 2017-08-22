@@ -21,16 +21,23 @@ public class PlayActivity extends AppCompatActivity {
     private boolean won;
     private int minutes = 0;
 
+    Board board;
+
+    TextView flagsOnPlay;
+    TextView CubesOnPlay;
+
     TimeCounter timer = new TimeCounter(MAX_GAME_DURATION) {
         public void onTick(int second) {
             if(second%60 == 0 &&second >0)
                 minutes++;
+            update();
             TextView textTime = (TextView) findViewById(R.id.timer);
             if((second%60)/10 == 0)
                 textTime.setText(getString(R.string.play_activity_time) + " " +minutes + ":0" + String.valueOf(second%60));
             else
                 textTime.setText(getString(R.string.play_activity_time) + " " +minutes + ":" + String.valueOf(second%60));
         }
+
     };
 
 
@@ -42,6 +49,10 @@ public class PlayActivity extends AppCompatActivity {
 
         timer.start();
         final long startTime = System.currentTimeMillis();
+
+        flagsOnPlay = (TextView) findViewById(R.id.flags);
+        CubesOnPlay = (TextView) findViewById(R.id.score);
+
 
         Button quit = (Button) findViewById(R.id.button_quit);
 
@@ -56,16 +67,18 @@ public class PlayActivity extends AppCompatActivity {
                 won = false;
                 intent.putExtra(Keys.RESULT, won);
                 intent.putExtra(Keys.TIME, difference);
+                int cubes = getUpdatedCubes();
+                intent.putExtra(Keys.GOOD_CUBES,cubes);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
                 finish();
 
             }
         });
-        buildBoard();
+        board = buildBoard();
     }
 
-    public void buildBoard() {
+    public Board buildBoard() {
 
         Bundle bundle = getIntent().getExtras();
         MainActivity.eDifficulty difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
@@ -78,7 +91,7 @@ public class PlayActivity extends AppCompatActivity {
 
 
         Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth, numOfMines);
-
+        return board;
     }
 
 
@@ -100,5 +113,38 @@ public class PlayActivity extends AppCompatActivity {
         return theSmallerAxis / fraction;
     }
 
+
+
+    public void update(){
+
+        int flags = getUpdatedFlags();
+        int cubes = getUpdatedCubes();
+
+        flagsOnPlay.setText(getString(R.string.flags) + " " +flags);
+        CubesOnPlay.setText(getString(R.string.score) + " " +cubes);
+
+    }
+    public int getUpdatedFlags(){
+        Block[][] blocks = board.getBlocks();
+        int flags = 0;
+        for(int i = 0; i<blocks.length; i++) {
+            for (int j = 0; j < blocks.length; j++) {
+                if (blocks[i][j].getIsFlagged())
+                    flags++;
+            }
+        }
+        return flags;
+    }
+    public int getUpdatedCubes(){
+            Block[][] blocks = board.getBlocks();
+            int cubes = 0;
+            for(int i = 0; i<blocks.length; i++) {
+                for (int j = 0; j < blocks.length; j++) {
+                    if(blocks[i][j].getIsPressed() && !(blocks[i][j].hasMine()))
+                        cubes++;
+                }
+            }
+            return cubes;
+    }
 
 }

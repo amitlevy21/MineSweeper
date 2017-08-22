@@ -79,6 +79,7 @@ public class Block extends AppCompatButton{
             if (!isFlagged) {
                 setBackgroundResource(R.drawable.ic_flag);
                 isFlagged = true;
+                setText("F");
             } else {
                 setBackgroundResource(0);
                 setBackgroundResource(R.drawable.ic_frame);
