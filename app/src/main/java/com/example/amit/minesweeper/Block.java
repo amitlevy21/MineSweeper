@@ -22,7 +22,9 @@ public class Block extends AppCompatButton{
 
         super(context);
         setLayoutParams(new ViewGroup.LayoutParams(size,size));
-        setBackgroundColor(Color.LTGRAY);
+        //setBackgroundColor(Color.LTGRAY);
+        setBackgroundResource(R.drawable.ic_frame);
+
         setPadding(20,20,20,20);
         this.row = row;
         this.col = col;
@@ -63,6 +65,7 @@ public class Block extends AppCompatButton{
                     setBackgroundColor(Color.RED);
                     return true;
                 } else {
+                    setBackgroundResource(R.drawable.ic_frame_pressed);
                     setText(String.valueOf(numOfMinesAround));
                     return false;
                 }
@@ -74,10 +77,12 @@ public class Block extends AppCompatButton{
     public void markFlag() {
         if (!isPressed) {
             if (!isFlagged) {
-                //setBackgroundResource(R.);
+                setBackgroundResource(R.drawable.ic_flag);
                 isFlagged = true;
             } else {
-                setText("");
+                setBackgroundResource(0);
+                setBackgroundResource(R.drawable.ic_frame);
+
                 isFlagged = false;
             }
         }
