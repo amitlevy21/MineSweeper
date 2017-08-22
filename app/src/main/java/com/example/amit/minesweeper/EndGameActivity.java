@@ -30,8 +30,8 @@ public class EndGameActivity extends AppCompatActivity {
             TextView textTime = (TextView) findViewById(R.id.time);
             textTime.setText(getString(R.string.end_activity_time) + " " + timeToShow + " sec");
 
-            TextView numOfGoodFlags = (TextView) findViewById(R.id.num_of_good_flags);
-            numOfGoodFlags.setText(getString(R.string.num_of_correct_flags) + " " +goodCubes );
+            TextView numOfGoodCubes = (TextView) findViewById(R.id.num_of_good_cubes);
+            numOfGoodCubes.setText(getString(R.string.num_of_correct_cubes) + " " +goodCubes );
 
         tryAgain.setOnClickListener(new View.OnClickListener() {
             @Override
