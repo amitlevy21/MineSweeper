@@ -3,7 +3,9 @@ package com.example.amit.minesweeper;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageButton;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 
 public class Block extends AppCompatButton{
@@ -21,6 +23,7 @@ public class Block extends AppCompatButton{
         super(context);
         setLayoutParams(new ViewGroup.LayoutParams(size,size));
         setBackgroundColor(Color.LTGRAY);
+        setPadding(20,20,20,20);
         this.row = row;
         this.col = col;
 
@@ -71,7 +74,7 @@ public class Block extends AppCompatButton{
     public void markFlag() {
         if (!isPressed) {
             if (!isFlagged) {
-                setText("F");
+                //setBackgroundResource(R.);
                 isFlagged = true;
             } else {
                 setText("");

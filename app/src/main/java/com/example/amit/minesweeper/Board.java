@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,19 +13,20 @@ import java.util.Random;
 
 
 
-public class Board  {
+public class Board{
 
 
     private Block[][] blocks;
     private int totalNumOfBlocks;
-    private int currentNumOfBlocks;
     private GridLayout gridLayout;
     private int numOfFlags;
     private int numOfMines;
     private boolean minePressed;
+    private int numOfPressedBlocks;
 
 
     public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines) {
+
         this.totalNumOfBlocks = boardSize*boardSize;
         blocks = new Block[boardSize][boardSize];
         this.gridLayout = gridLayout;
@@ -44,6 +46,7 @@ public class Board  {
     }
 
     private void createBlocks(Context context,int boardSize, int buttonWidth) {
+
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 blocks[i][j] = new Block(context, i, j, buttonWidth);
@@ -58,7 +61,9 @@ public class Board  {
                             pressBlockAndNeighbours(block.getRow(), block.getCol());
                         }else {
                             block.press();
+                            numOfPressedBlocks++;
                         }
+                        //if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) // players has won
 
                     }
                 });
@@ -80,27 +85,25 @@ public class Board  {
         if(row * gridLayout.getColumnCount() + col >= totalNumOfBlocks)
             return false;
         blocks[row][col] = block;
-        currentNumOfBlocks++;
         gridLayout.addView(block);
         return true;
     }
 
+    /** Randomly spread mines */
     private void setMines() {
         final Random rnd = new Random();
-        final int N = blocks.length * blocks[0].length;
-        final int K = numOfMines;
-        final List<Integer> S = new ArrayList<>(N);
+        final List<Integer> randomNum = new ArrayList<>(blocks.length * blocks[0].length);
 
-        for (int i = 0; i < N; i++) {
-            S.add(i);
+        for (int i = 0; i < blocks.length * blocks[0].length; i++) {
+            randomNum.add(i);
         }
 
-        Collections.shuffle(S, rnd);
-        List<Integer> rows = new ArrayList<>(S);
-        Collections.shuffle(S,rnd);
-        List<Integer> cols = new ArrayList<>(S);
+        Collections.shuffle(randomNum, rnd);
+        List<Integer> rows = new ArrayList<>(randomNum);
+        Collections.shuffle(randomNum,rnd);
+        List<Integer> cols = new ArrayList<>(randomNum);
 
-        for (int i = 0; i < K; i++) {
+        for (int i = 0; i < numOfMines; i++) {
             blocks[rows.get(i) % (blocks.length - 1)][cols.get(i) % (blocks[0].length - 1)].setHasMine(true);
         }
 
@@ -125,6 +128,7 @@ public class Board  {
 
         if (blocks[row][col].getNumOfMinesAround() == 0 && !blocks[row][col].getIsPressed()) {
             blocks[row][col].press();
+            numOfPressedBlocks++;
             pressBlockAndNeighbours(row, col + 1);
             pressBlockAndNeighbours(row, col - 1);
             pressBlockAndNeighbours(row - 1, col);

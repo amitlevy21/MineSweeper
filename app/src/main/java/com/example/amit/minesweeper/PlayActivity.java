@@ -8,6 +8,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.TextView;
 
 
@@ -74,6 +75,7 @@ public class PlayActivity extends AppCompatActivity {
         int buttonWidth = calculateButtonSize(difficulty);
 
         GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
+
 
         Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth, numOfMines);
 
