@@ -15,11 +15,12 @@ public class PlayActivity extends AppCompatActivity {
 
     public static final int BIGGER_FRACTION = 6;
     public static final int SMALLER_FRACTION = 11;
+    public static final int MAX_GAME_DURATION = 300000000;
 
     private boolean won;
     private int minutes = 0;
 
-    TimeCounter timer = new TimeCounter(300000000) {
+    TimeCounter timer = new TimeCounter(MAX_GAME_DURATION) {
         public void onTick(int second) {
             if(second%60 == 0 &&second >0)
                 minutes++;

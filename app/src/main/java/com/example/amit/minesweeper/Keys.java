@@ -1,8 +1,5 @@
 package com.example.amit.minesweeper;
 
-/**
- * Created by Amit Levy on 11/08/17.
- */
 
 public class Keys {
     public static final String DIFFICULTY = "difficulty";

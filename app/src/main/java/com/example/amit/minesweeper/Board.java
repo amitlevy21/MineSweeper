@@ -14,7 +14,6 @@ import java.util.Random;
 
 public class Board  {
 
-    public static final int MAX_NUM_OF_MINES_AROUND_BLOCK = 4;
 
     private Block[][] blocks;
     private int totalNumOfBlocks;
