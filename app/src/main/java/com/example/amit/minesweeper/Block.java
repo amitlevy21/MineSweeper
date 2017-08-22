@@ -10,7 +10,6 @@ import android.widget.ImageView;
 
 public class Block extends AppCompatButton{
 
-
     private boolean isPressed = false;
     private boolean isFlagged = false;
     private boolean hasMine = false;
@@ -21,16 +20,13 @@ public class Block extends AppCompatButton{
     public Block(Context context, int row, int col, int size) {
 
         super(context);
-        setLayoutParams(new ViewGroup.LayoutParams(size,size));
+        setLayoutParams(new ViewGroup.LayoutParams(size, size));
         //setBackgroundColor(Color.LTGRAY);
         setBackgroundResource(R.drawable.ic_frame);
 
         this.row = row;
         this.col = col;
-
-
     }
-
     public int getRow() { return row; }
 
     public int getCol() { return col; }
@@ -57,7 +53,7 @@ public class Block extends AppCompatButton{
 
     /** Returns true if the player has clicked a mine, false otherwise */
     public boolean press() {
-        if(!isFlagged) {
+        if (!isFlagged) {
             if (!isPressed) {
                 isPressed = true;
                 if (hasMine) {
@@ -65,14 +61,32 @@ public class Block extends AppCompatButton{
                     return true;
                 } else {
                     setBackgroundResource(R.drawable.ic_frame_pressed);
-                    if(numOfMinesAround != 0)
-                        setText(String.valueOf(numOfMinesAround));
-                    return false;
+                    if (numOfMinesAround != 0) {
+                        int numOfMinesAroundPicture = whichPicture(getNumOfMinesAround());
+                        setBackgroundResource(numOfMinesAroundPicture);
+                        return false;
+                    }
                 }
             }
-        }
-        return false;
+
+        }return false;
     }
+
+    public int whichPicture(int numOfMinesAround){
+
+        switch (numOfMinesAround) {
+            case 1: return R.drawable.ic_action_name1;
+            case 2: return R.drawable.ic_action_name2;
+            case 3: return R.drawable.ic_action_name3;
+            case 4: return R.drawable.ic_action_name4;
+            case 5: return R.drawable.ic_action_name5;
+            case 6: return R.drawable.ic_action_name6;
+            case 7: return R.drawable.ic_action_name7;
+            case 8: return R.drawable.ic_action_name8;
+            default: break;
+        }return 0;
+    }
+
 
     public void markFlag() {
         if (!isPressed) {

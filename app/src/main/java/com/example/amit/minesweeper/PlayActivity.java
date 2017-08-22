@@ -15,7 +15,7 @@ import android.widget.TextView;
 public class PlayActivity extends AppCompatActivity {
 
     public static final int BIGGER_FRACTION = 6;
-    public static final int SMALLER_FRACTION = 11;
+    public static final int SMALLER_FRACTION = 12;
     public static final int MAX_GAME_DURATION = 300000000;
 
     private boolean won;
