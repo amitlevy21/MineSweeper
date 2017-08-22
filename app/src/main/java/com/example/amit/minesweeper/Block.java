@@ -25,7 +25,6 @@ public class Block extends AppCompatButton{
         //setBackgroundColor(Color.LTGRAY);
         setBackgroundResource(R.drawable.ic_frame);
 
-        setPadding(20,20,20,20);
         this.row = row;
         this.col = col;
 
@@ -66,7 +65,8 @@ public class Block extends AppCompatButton{
                     return true;
                 } else {
                     setBackgroundResource(R.drawable.ic_frame_pressed);
-                    setText(String.valueOf(numOfMinesAround));
+                    if(numOfMinesAround != 0)
+                        setText(String.valueOf(numOfMinesAround));
                     return false;
                 }
             }
@@ -79,7 +79,6 @@ public class Block extends AppCompatButton{
             if (!isFlagged) {
                 setBackgroundResource(R.drawable.ic_flag);
                 isFlagged = true;
-                setText("F");
             } else {
                 setBackgroundResource(0);
                 setBackgroundResource(R.drawable.ic_frame);
