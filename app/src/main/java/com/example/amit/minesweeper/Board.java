@@ -1,6 +1,7 @@
 package com.example.amit.minesweeper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
+import java.util.Timer;
 
 
 public class Board{
@@ -23,6 +24,11 @@ public class Board{
     private int numOfMines;
     private boolean minePressed;
     private int numOfPressedBlocks;
+    Context context;
+
+    long startTime;
+
+
 
 
     public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines) {
@@ -33,6 +39,10 @@ public class Board{
         this.gridLayout.setRowCount(boardSize);
         this.gridLayout.setColumnCount(boardSize);
         this.numOfMines = numOfMines;
+        this.context = context;
+
+
+        startTime = System.currentTimeMillis();
 
         createBlocks(context, boardSize, buttonWidth);
         setMines();
@@ -61,10 +71,8 @@ public class Board{
                             pressBlockAndNeighbours(block.getRow(), block.getCol());
                         }else {
                             block.press();
-                            numOfPressedBlocks++;
                         }
-                        //if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) // players has won
-
+                        gameSituation();
                     }
                 });
                 blocks[i][j].setOnLongClickListener(new View.OnLongClickListener() {
@@ -72,13 +80,90 @@ public class Board{
                     public boolean onLongClick(View view) {
                         Block block = (Block) view;
                         block.markFlag();
-                        numOfFlags++;
+                        gameSituation();
                         return true;
+
+
                     }
                 });
             }
-
         }
+
+    }
+    public void gameSituation(){
+        int counter = 0;
+        Block[][] blocks = getBlocks();
+        for(int i = 0; i<blocks.length; i++){
+            for(int j = 0; j<blocks.length; j++){
+                if((blocks[i][j].getIsPressed()) || (blocks[i][j].getIsFlagged()))
+                    counter++;
+            }
+        }
+        if(counter == (blocks.length*blocks.length))
+            hasWon();
+        else
+            hasLost();
+    }
+
+    public void hasWon(){
+        String lost = "lost";
+        String won = "won";
+        int wrong = 0, goodCubes = 0, goodFlags = 0;
+        Block[][] blocks = getBlocks();
+        for(int i = 0; i<blocks.length; i++){
+            for(int j = 0; j<blocks.length; j++) {
+                if(blocks[i][j].getIsPressed() && !(blocks[i][j].hasMine())){
+                    goodCubes++;
+                }
+                if(blocks[i][j].getIsFlagged() && blocks[i][j].hasMine()){
+                    goodFlags++;
+                }
+              if((blocks[i][j].getIsPressed() && blocks[i][j].hasMine()) || (blocks[i][j].getIsFlagged()) && !(blocks[i][j].hasMine())) {
+                  wrong++;
+                  endGame(lost, goodCubes, goodFlags);
+              }
+            }
+        }
+        if(wrong == 0) {
+            endGame(won, goodCubes, goodFlags);
+        }
+    }
+
+    public void hasLost(){
+        String lost = "lost";
+        int goodCubes = 0, goodFlags = 0;
+        Block[][] blocks = getBlocks();
+        for(int i = 0; i<blocks.length; i++){
+            for(int j = 0; j<blocks.length; j++) {
+                if(blocks[i][j].isPressed() && !(blocks[i][j].hasMine())){
+                    goodCubes++;
+                }
+                if(blocks[i][j].getIsFlagged() && blocks[i][j].hasMine()){
+                    goodFlags++;
+                }
+                if(blocks[i][j].isPressed() && blocks[i][j].hasMine()) {
+                    endGame(lost, goodCubes, goodFlags);
+                }
+            }
+        }
+    }
+
+    public void endGame(String situation, int goodCubes, int goodFlags){
+        Intent intent = new Intent(context, EndGameActivity.class);
+
+            long difference = System.currentTimeMillis() - startTime;
+
+            boolean won = true;
+            if(!(situation.compareTo("won")== 0))
+                won = false;
+            intent.putExtra(Keys.RESULT, won);
+            intent.putExtra(Keys.TIME, difference);
+
+            intent.putExtra(Keys.GOOD_CUBES,goodCubes);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+
     }
 
     private boolean addBlock(Block block, int row, int col) {

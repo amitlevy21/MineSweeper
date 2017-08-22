@@ -62,6 +62,7 @@ public class PlayActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(view.getContext(), EndGameActivity.class);
 
+
                 long difference = System.currentTimeMillis() - startTime;
 
                 won = false;
