@@ -88,6 +88,9 @@ public class Board{
         gridLayout.addView(block);
         return true;
     }
+    public Block[][] getBlocks(){
+        return blocks;
+    }
 
     /** Randomly spread mines */
     private void setMines() {

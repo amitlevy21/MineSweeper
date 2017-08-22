@@ -17,6 +17,8 @@
     <string name="lost_text">you have lost</string>
     <string name="won_text">you have won</string>
     <string name="play_activity_time">Time:</string>
+
+
     <string-array name="difficulties_array">
 
         <item>Easy</item>

@@ -15,6 +15,7 @@
         android:layout_margin="8dp">
 
         <TextView
+            android:id="@+id/score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/score"
@@ -22,6 +23,7 @@
             android:layout_weight="1"/>
 
         <TextView
+            android:id="@+id/flags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/flags"
