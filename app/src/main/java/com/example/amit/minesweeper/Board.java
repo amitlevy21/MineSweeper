@@ -2,6 +2,7 @@ package com.example.amit.minesweeper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -14,7 +15,7 @@ import java.util.Random;
 import java.util.Timer;
 
 
-public class Board{
+public class Board {
 
 
     private Block[][] blocks;
@@ -29,11 +30,9 @@ public class Board{
     long startTime;
 
 
-
-
     public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines) {
 
-        this.totalNumOfBlocks = boardSize*boardSize;
+        this.totalNumOfBlocks = boardSize * boardSize;
         blocks = new Block[boardSize][boardSize];
         this.gridLayout = gridLayout;
         this.gridLayout.setRowCount(boardSize);
@@ -55,7 +54,7 @@ public class Board{
         }
     }
 
-    private void createBlocks(Context context,int boardSize, int buttonWidth) {
+    private void createBlocks(Context context, int boardSize, int buttonWidth) {
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
@@ -67,14 +66,15 @@ public class Board{
                     @Override
                     public void onClick(View view) {
                         Block block = (Block) view;
-                        if(block.getNumOfMinesAround() == 0) {
+                        if (block.getNumOfMinesAround() == 0) {
                             pressBlockAndNeighbours(block.getRow(), block.getCol());
-                        }else {
+                        } else {
                             block.press();
                         }
                         gameSituation();
                     }
                 });
+
                 blocks[i][j].setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
@@ -88,24 +88,46 @@ public class Board{
                 });
             }
         }
-
     }
+
+
     public void gameSituation(){
-        int counter = 0;
+        String lost = "lost";
+        String won = "won";
+        int counter = 0, goodFlags = 0, goodCubes = 0, wrong = 0;
         Block[][] blocks = getBlocks();
         for(int i = 0; i<blocks.length; i++){
             for(int j = 0; j<blocks.length; j++){
-                if((blocks[i][j].getIsPressed()) || (blocks[i][j].getIsFlagged()))
-                    counter++;
+
+                if((blocks[i][j].getIsPressed()) && !(blocks[i][j].hasMine())) {
+                    goodCubes++;
+                }
+                if((blocks[i][j].getIsFlagged()) && (blocks[i][j].hasMine())) {
+                    goodFlags++;
+                }
+                if((blocks[i][j].getIsPressed()) && (blocks[i][j].hasMine())) {
+                    wrong++;
+                }
             }
         }
-        if(counter == (blocks.length*blocks.length))
+        if((goodCubes+goodFlags) == (blocks.length*blocks.length)){
+            if(numOfMines==goodFlags){
+                endGame(won, goodCubes, goodFlags);
+            }
+            else{
+                endGame(lost, goodCubes, goodFlags);
+            }
+        }
+        if(wrong !=0)
+            endGame(lost, goodCubes, goodFlags);
+
+        /*if(counter == (blocks.length*blocks.length))
             hasWon();
         else
-            hasLost();
+            hasLost();*/
     }
 
-    public void hasWon(){
+    /*public void hasWon(){
         String lost = "lost";
         String won = "won";
         int wrong = 0, goodCubes = 0, goodFlags = 0;
@@ -146,7 +168,7 @@ public class Board{
                 }
             }
         }
-    }
+    }*/
 
     public void endGame(String situation, int goodCubes, int goodFlags){
         Intent intent = new Intent(context, EndGameActivity.class);
