@@ -69,7 +69,9 @@ public class PlayActivity extends AppCompatActivity {
                 intent.putExtra(Keys.RESULT, won);
                 intent.putExtra(Keys.TIME, difference);
                 int cubes = getUpdatedCubes();
+                int goodFlags = getUpdatedFlags();
                 intent.putExtra(Keys.GOOD_CUBES,cubes);
+                intent.putExtra(Keys.GOOD_FLAGS,goodFlags);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
                 finish();
@@ -130,7 +132,7 @@ public class PlayActivity extends AppCompatActivity {
         int flags = 0;
         for(int i = 0; i<blocks.length; i++) {
             for (int j = 0; j < blocks.length; j++) {
-                if (blocks[i][j].getIsFlagged())
+                if (blocks[i][j].getIsFlagged() && !(blocks[i][j].hasMine()))
                     flags++;
             }
         }

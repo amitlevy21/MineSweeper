@@ -94,24 +94,32 @@ public class Board {
     public void gameSituation(){
         String lost = "lost";
         String won = "won";
-        int counter = 0, goodFlags = 0, goodCubes = 0, wrong = 0;
+        int counter = 0, goodFlags = 0, goodCubes = 0, wrong = 0, wrongFlag = 0;
         Block[][] blocks = getBlocks();
         for(int i = 0; i<blocks.length; i++){
             for(int j = 0; j<blocks.length; j++){
+                if((blocks[i][j].getIsPressed()) || (blocks[i][j].getIsFlagged()))
+                    counter++;
+                if(blocks[i][j].getIsPressed()) {
+                    if (!(blocks[i][j].hasMine()))
+                        goodCubes++;
+                    else
+                        wrong++;
+                }
+                else if(blocks[i][j].getIsFlagged()){
+                        if(blocks[i][j].hasMine())
+                            goodFlags++;
+                        else
+                            wrongFlag++;
+                }
 
-                if((blocks[i][j].getIsPressed()) && !(blocks[i][j].hasMine())) {
-                    goodCubes++;
-                }
-                if((blocks[i][j].getIsFlagged()) && (blocks[i][j].hasMine())) {
-                    goodFlags++;
-                }
-                if((blocks[i][j].getIsPressed()) && (blocks[i][j].hasMine())) {
-                    wrong++;
-                }
             }
         }
-        if((goodCubes+goodFlags) == (blocks.length*blocks.length)){
-            if(numOfMines==goodFlags){
+
+
+
+        if(((goodCubes+goodFlags) == (blocks.length*blocks.length)) || (counter==(blocks.length*blocks.length))){
+            if((numOfMines==goodFlags) && (wrongFlag != 0)){
                 endGame(won, goodCubes, goodFlags);
             }
             else{
@@ -182,6 +190,7 @@ public class Board {
             intent.putExtra(Keys.TIME, difference);
 
             intent.putExtra(Keys.GOOD_CUBES,goodCubes);
+            intent.putExtra(Keys.GOOD_FLAGS,goodFlags);
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
