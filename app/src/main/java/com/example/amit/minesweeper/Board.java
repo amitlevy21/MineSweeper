@@ -119,7 +119,7 @@ public class Board {
 
 
         if(((goodCubes+goodFlags) == (blocks.length*blocks.length)) || (counter==(blocks.length*blocks.length))){
-            if((numOfMines==goodFlags) && (wrongFlag != 0)){
+            if((numOfMines==goodFlags) && (wrongFlag == 0)){
                 endGame(won, goodCubes, goodFlags);
             }
             else{
@@ -128,55 +128,9 @@ public class Board {
         }
         if(wrong !=0)
             endGame(lost, goodCubes, goodFlags);
-
-        /*if(counter == (blocks.length*blocks.length))
-            hasWon();
-        else
-            hasLost();*/
     }
 
-    /*public void hasWon(){
-        String lost = "lost";
-        String won = "won";
-        int wrong = 0, goodCubes = 0, goodFlags = 0;
-        Block[][] blocks = getBlocks();
-        for(int i = 0; i<blocks.length; i++){
-            for(int j = 0; j<blocks.length; j++) {
-                if(blocks[i][j].getIsPressed() && !(blocks[i][j].hasMine())){
-                    goodCubes++;
-                }
-                if(blocks[i][j].getIsFlagged() && blocks[i][j].hasMine()){
-                    goodFlags++;
-                }
-              if((blocks[i][j].getIsPressed() && blocks[i][j].hasMine()) || (blocks[i][j].getIsFlagged()) && !(blocks[i][j].hasMine())) {
-                  wrong++;
-                  endGame(lost, goodCubes, goodFlags);
-              }
-            }
-        }
-        if(wrong == 0) {
-            endGame(won, goodCubes, goodFlags);
-        }
-    }
 
-    public void hasLost(){
-        String lost = "lost";
-        int goodCubes = 0, goodFlags = 0;
-        Block[][] blocks = getBlocks();
-        for(int i = 0; i<blocks.length; i++){
-            for(int j = 0; j<blocks.length; j++) {
-                if(blocks[i][j].isPressed() && !(blocks[i][j].hasMine())){
-                    goodCubes++;
-                }
-                if(blocks[i][j].getIsFlagged() && blocks[i][j].hasMine()){
-                    goodFlags++;
-                }
-                if(blocks[i][j].isPressed() && blocks[i][j].hasMine()) {
-                    endGame(lost, goodCubes, goodFlags);
-                }
-            }
-        }
-    }*/
 
     public void endGame(String situation, int goodCubes, int goodFlags){
         Intent intent = new Intent(context, EndGameActivity.class);
