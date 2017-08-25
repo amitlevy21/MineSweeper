@@ -43,9 +43,11 @@ public class EndGameActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent intent = new Intent(view.getContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
                 startActivity(intent);
-
-
+                finish();
             }
         });
     }

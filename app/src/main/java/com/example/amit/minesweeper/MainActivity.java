@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 intent.putExtra(Keys.BOARD_SIZE, BOARD_SIZE[difficulty]);
                 intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
 
+
+
                 showDifficulty = difficulties[difficulty].toString();
                 played = true;
                 startActivity(intent);

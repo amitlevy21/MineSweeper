@@ -1,6 +1,7 @@
 package com.example.amit.minesweeper;
 
 
+@SuppressWarnings("WeakerAccess")
 public class Keys {
     public static final String DIFFICULTY = "difficulty";
     public static final String NUM_OF_MINES = "num of mines";

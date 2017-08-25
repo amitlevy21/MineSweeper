@@ -11,12 +11,12 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 
 
-public class PlayActivity extends AppCompatActivity {
+public class PlayActivity extends AppCompatActivity implements Board.BoardListener {
 
     public static final int BIGGER_FRACTION = 6;
     public static final int SMALLER_FRACTION = 12;
 
-    private boolean won;
+
     private int seconds = 0;
 
     private Board board;
@@ -33,13 +33,10 @@ public class PlayActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent intent = new Intent(view.getContext(), EndGameActivity.class);
-
-
-                won = false;
                 intent.putExtra(Keys.RESULT, false);
                 intent.putExtra(Keys.TIME, seconds);
-                int cubes = getUpdatedCubes();
-                int goodFlags = getCorrectFlags();
+                int cubes = board.getNumOfPressedBlocks();
+                int goodFlags = board.getNumOfGoodFlags();
                 intent.putExtra(Keys.GOOD_CUBES,cubes);
                 intent.putExtra(Keys.GOOD_FLAGS,goodFlags);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -50,7 +47,7 @@ public class PlayActivity extends AppCompatActivity {
         });
         board = buildBoard();
         tickEndlessly();
-        update();
+
     }
 
     public Board buildBoard() {
@@ -65,7 +62,8 @@ public class PlayActivity extends AppCompatActivity {
         GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
 
 
-        Board board = new Board(getApplicationContext(),gridLayout, boardSize, buttonWidth, numOfMines);
+        Board board = new Board(this, gridLayout, boardSize, buttonWidth, numOfMines);
+        board.setBoardListener(this);
         return board;
     }
 
@@ -112,37 +110,29 @@ public class PlayActivity extends AppCompatActivity {
             public void run() {
                 TextView textTime = (TextView) findViewById(R.id.timer);
                 textTime.setText(getString(R.string.play_activity_time) + " " + seconds);
-                board.setSeconds(seconds++);
+                board.updateSecond(seconds++);
             }
         });
 
     }
 
-    public void update(){
-
+    @Override
+    public void onUpdate(int numOfPressedBlocks, int numOfFlags) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int flags = getUpdatedFlags();
-                int cubes = getUpdatedCubes();
 
                 TextView flagsOnPlay = (TextView) findViewById(R.id.flags);
                 TextView CubesOnPlay = (TextView) findViewById(R.id.score);
-                flagsOnPlay.setText(getString(R.string.flags) + " " + flags);
-                CubesOnPlay.setText(getString(R.string.score) + " " + cubes);
+                flagsOnPlay.setText(getString(R.string.flags) + " " + board.getNumOfFlags());
+                CubesOnPlay.setText(getString(R.string.score) + " " + board.getNumOfPressedBlocks());
             }
         });
-
-
-    }
-    public int getUpdatedFlags(){
-        return board.getNumOfFlags();
-    }
-    public int getCorrectFlags(){
-        return board.getNumOfGoodFlags();
-    }
-    public int getUpdatedCubes(){
-        return board.getNumOfPressedBlocks();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        board.setBoardListener(null); // clear reference to the PlayActivity for garbage collector to clean
+    }
 }
