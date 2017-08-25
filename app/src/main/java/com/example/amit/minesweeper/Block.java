@@ -3,9 +3,8 @@ package com.example.amit.minesweeper;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatImageButton;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+
 
 
 public class Block extends AppCompatButton{
@@ -32,10 +31,6 @@ public class Block extends AppCompatButton{
 
     public boolean getIsPressed() { // do not override isPressed by View class
         return isPressed;
-    }
-
-    public boolean getIsFlagged() {
-        return isFlagged;
     }
 
     public int getNumOfMinesAround() {

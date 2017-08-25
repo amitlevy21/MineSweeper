@@ -1,20 +1,29 @@
 package com.example.amit.minesweeper;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-
+@SuppressWarnings("WeakerAccess") //Android studio keeps saying we should make this class and all its methods in private..
 public class Board {
 
+    interface BoardListener {
 
+        void onUpdate(int numOfPressedBlocks, int numOfFlags);
+    }
+
+    public void setBoardListener(BoardListener boardListener) {
+        this.boardListener = boardListener;
+    }
+
+    private BoardListener boardListener;
     private Block[][] blocks;
     private int totalNumOfBlocks;
     private GridLayout gridLayout;
@@ -42,12 +51,12 @@ public class Board {
         setMines();
     }
 
-    private void createBlocks(Context context, int boardSize, int buttonWidth) {
+    private void createBlocks(Context context, int boardSize, int buttonSize) {
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                blocks[i][j] = new Block(context, i, j, buttonWidth);
-                blocks[i][j].setLayoutParams(new ViewGroup.LayoutParams(buttonWidth, buttonWidth));
+                blocks[i][j] = new Block(context, i, j, buttonSize);
+                blocks[i][j].setLayoutParams(new ViewGroup.LayoutParams(buttonSize, buttonSize));
                 blocks[i][j].setLongClickable(true);
                 addBlock(blocks[i][j], i, j);
                 blocks[i][j].setOnClickListener(new View.OnClickListener() {
@@ -58,17 +67,14 @@ public class Board {
                             won = false;
                             endGame();
                         }
-                        if(block.getNumOfMinesAround() == 0) {
-                            pressNeighbours(block.getRow(), block.getCol());
-                        }
-                        else {
-                            block.press();
-                            numOfPressedBlocks++;
-                        }
+                        pressNeighbours(block.getRow(), block.getCol());
+
                         if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) {
                             won = true;
                             endGame();
                         }
+
+                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags);
                     }
                 });
 
@@ -99,9 +105,12 @@ public class Board {
         intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
         intent.putExtra(Keys.GOOD_FLAGS, numOfGoodFlags);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        context.startActivity(intent);
+        if(context instanceof Activity) {
+            ((Activity)context).finish();
+        }
     }
 
     private boolean addBlock(Block block, int row, int col) {
@@ -155,15 +164,20 @@ public class Board {
 
 
     private void pressNeighbours(int row, int col) {
-        if (col < 0 || col >= blocks[0].length || row < 0 || row >= blocks.length) return;
 
-        if (blocks[row][col].getNumOfMinesAround() == 0 && !blocks[row][col].getIsPressed()) {
+        if( row >= 0 && col >= 0 && row < blocks.length && col < blocks[0].length && !blocks[row][col].getIsPressed()){
             blocks[row][col].press();
             numOfPressedBlocks++;
-            pressNeighbours(row, col + 1);
-            pressNeighbours(row, col - 1);
-            pressNeighbours(row - 1, col);
-            pressNeighbours(row + 1, col);
+
+            if( blocks[row][col].getNumOfMinesAround() == 0 ){
+                for( int xt = -1 ; xt <= 1 ; xt++ ){
+                    for( int yt = -1 ; yt <= 1 ; yt++){
+                        if( xt != yt ){
+                            pressNeighbours(row + xt , col + yt);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -176,11 +190,10 @@ public class Board {
     }
 
     public int getNumOfGoodFlags() {
-
         return numOfGoodFlags;
     }
 
-    public void setSeconds(int seconds) {
+    public void updateSecond(int seconds) {
         this.seconds = seconds;
     }
 }
