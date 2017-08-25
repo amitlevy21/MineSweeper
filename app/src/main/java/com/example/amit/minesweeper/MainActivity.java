@@ -17,20 +17,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EASY, INTERMEDIATE, HARD
     }
 
-    static boolean played = false;
-    static String showDifficulty;
+    private static boolean played = false;
+    private static String showDifficulty;
 
     public static final int[] BOARD_SIZE = {10, 10, 5};
     public static final int[] NUM_OF_MINES = {5, 10, 10};
 
-    TextView difficultyPlayed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
+        TextView difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
         difficultyPlayed.setText(getString(R.string.last_mode_played) + " NOT PLAYED YET");
 
         final Spinner difficultySpinner = (Spinner) findViewById(R.id.difficulty_spinner);
@@ -63,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
         if (played) {
-            afterPlayedView();
+            difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
+            difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifficulty);
         }
     }
 
@@ -86,9 +86,5 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adapterView.setSelection(0);
     }
 
-    public void afterPlayedView() {
-        difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
-        difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifficulty);
-    }
 
 }

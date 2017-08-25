@@ -21,7 +21,6 @@ public class Block extends AppCompatButton{
 
         super(context);
         setLayoutParams(new ViewGroup.LayoutParams(size, size));
-        //setBackgroundColor(Color.LTGRAY);
         setBackgroundResource(R.drawable.ic_frame);
 
         this.row = row;

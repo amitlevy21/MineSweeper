@@ -2,17 +2,14 @@ package com.example.amit.minesweeper;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
-import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
 
 
 public class Board {
@@ -23,11 +20,12 @@ public class Board {
     private GridLayout gridLayout;
     private int numOfFlags;
     private int numOfMines;
-    private boolean minePressed;
     private int numOfPressedBlocks;
-    Context context;
+    private int numOfGoodFlags;
+    private Context context;
+    private boolean won;
+    private int seconds;
 
-    long startTime;
 
 
     public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines) {
@@ -40,18 +38,8 @@ public class Board {
         this.numOfMines = numOfMines;
         this.context = context;
 
-
-        startTime = System.currentTimeMillis();
-
         createBlocks(context, boardSize, buttonWidth);
         setMines();
-
-        for (int i = 0; i < blocks.length; i++) {
-            for (int j = 0; j < blocks[i].length; j++) {
-                int mines = numOfMinesAround(i, j);
-                blocks[i][j].setNumOfMinesAround(mines);
-            }
-        }
     }
 
     private void createBlocks(Context context, int boardSize, int buttonWidth) {
@@ -66,12 +54,21 @@ public class Board {
                     @Override
                     public void onClick(View view) {
                         Block block = (Block) view;
-                        if (block.getNumOfMinesAround() == 0) {
-                            pressBlockAndNeighbours(block.getRow(), block.getCol());
-                        } else {
-                            block.press();
+                        if (block.hasMine()) {
+                            won = false;
+                            endGame();
                         }
-                        gameSituation();
+                        if(block.getNumOfMinesAround() == 0) {
+                            pressNeighbours(block.getRow(), block.getCol());
+                        }
+                        else {
+                            block.press();
+                            numOfPressedBlocks++;
+                        }
+                        if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) {
+                            won = true;
+                            endGame();
+                        }
                     }
                 });
 
@@ -79,8 +76,10 @@ public class Board {
                     @Override
                     public boolean onLongClick(View view) {
                         Block block = (Block) view;
+                        if(block.hasMine())
+                            numOfGoodFlags++;
                         block.markFlag();
-                        gameSituation();
+                        numOfFlags++;
                         return true;
 
 
@@ -91,63 +90,17 @@ public class Board {
     }
 
 
-    public void gameSituation(){
-        String lost = "lost";
-        String won = "won";
-        int counter = 0, goodFlags = 0, goodCubes = 0, wrong = 0, wrongFlag = 0;
-        Block[][] blocks = getBlocks();
-        for(int i = 0; i<blocks.length; i++){
-            for(int j = 0; j<blocks.length; j++){
-                if((blocks[i][j].getIsPressed()) || (blocks[i][j].getIsFlagged()))
-                    counter++;
-                if(blocks[i][j].getIsPressed()) {
-                    if (!(blocks[i][j].hasMine()))
-                        goodCubes++;
-                    else
-                        wrong++;
-                }
-                else if(blocks[i][j].getIsFlagged()){
-                        if(blocks[i][j].hasMine())
-                            goodFlags++;
-                        else
-                            wrongFlag++;
-                }
-
-            }
-        }
-
-
-
-        if(((goodCubes+goodFlags) == (blocks.length*blocks.length)) || (counter==(blocks.length*blocks.length))){
-            if((numOfMines==goodFlags) && (wrongFlag == 0)){
-                endGame(won, goodCubes, goodFlags);
-            }
-            else{
-                endGame(lost, goodCubes, goodFlags);
-            }
-        }
-        if(wrong !=0)
-            endGame(lost, goodCubes, goodFlags);
-    }
-
-
-
-    public void endGame(String situation, int goodCubes, int goodFlags){
+    public void endGame(){
         Intent intent = new Intent(context, EndGameActivity.class);
 
-            long difference = System.currentTimeMillis() - startTime;
+        intent.putExtra(Keys.RESULT, won);
+        intent.putExtra(Keys.TIME, seconds);
 
-            boolean won = true;
-            if(!(situation.compareTo("won")== 0))
-                won = false;
-            intent.putExtra(Keys.RESULT, won);
-            intent.putExtra(Keys.TIME, difference);
-
-            intent.putExtra(Keys.GOOD_CUBES,goodCubes);
-            intent.putExtra(Keys.GOOD_FLAGS,goodFlags);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+        intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
+        intent.putExtra(Keys.GOOD_FLAGS, numOfGoodFlags);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
 
     }
 
@@ -157,9 +110,6 @@ public class Board {
         blocks[row][col] = block;
         gridLayout.addView(block);
         return true;
-    }
-    public Block[][] getBlocks(){
-        return blocks;
     }
 
     /** Randomly spread mines */
@@ -180,6 +130,13 @@ public class Board {
             blocks[rows.get(i) % (blocks.length - 1)][cols.get(i) % (blocks[0].length - 1)].setHasMine(true);
         }
 
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[i].length; j++) {
+                int mines = numOfMinesAround(i, j);
+                blocks[i][j].setNumOfMinesAround(mines);
+            }
+        }
+
     }
 
     private int numOfMinesAround(int row, int col){
@@ -196,18 +153,34 @@ public class Board {
         return mines;
     }
 
-    private void pressBlockAndNeighbours(int row, int col) {
+
+    private void pressNeighbours(int row, int col) {
         if (col < 0 || col >= blocks[0].length || row < 0 || row >= blocks.length) return;
 
         if (blocks[row][col].getNumOfMinesAround() == 0 && !blocks[row][col].getIsPressed()) {
             blocks[row][col].press();
             numOfPressedBlocks++;
-            pressBlockAndNeighbours(row, col + 1);
-            pressBlockAndNeighbours(row, col - 1);
-            pressBlockAndNeighbours(row - 1, col);
-            pressBlockAndNeighbours(row + 1, col);
+            pressNeighbours(row, col + 1);
+            pressNeighbours(row, col - 1);
+            pressNeighbours(row - 1, col);
+            pressNeighbours(row + 1, col);
         }
     }
 
+    public int getNumOfFlags() {
+        return numOfFlags;
+    }
 
+    public int getNumOfPressedBlocks() {
+        return numOfPressedBlocks;
+    }
+
+    public int getNumOfGoodFlags() {
+
+        return numOfGoodFlags;
+    }
+
+    public void setSeconds(int seconds) {
+        this.seconds = seconds;
+    }
 }
