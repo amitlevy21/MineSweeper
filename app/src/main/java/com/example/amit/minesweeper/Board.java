@@ -86,6 +86,7 @@ public class Board {
                             numOfGoodFlags++;
                         block.markFlag();
                         numOfFlags++;
+                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags);
                         return true;
 
 
