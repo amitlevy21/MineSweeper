@@ -66,6 +66,10 @@ public class Block extends AppCompatButton{
         }return false;
     }
 
+    public boolean isFlagged() {
+        return isFlagged;
+    }
+
     public int whichPicture(int numOfMinesAround){
 
         switch (numOfMinesAround) {
@@ -78,6 +82,7 @@ public class Block extends AppCompatButton{
             case 7: return R.drawable.ic_action_name7;
             case 8: return R.drawable.ic_action_name8;
             default: break;
+
         }return 0;
     }
 

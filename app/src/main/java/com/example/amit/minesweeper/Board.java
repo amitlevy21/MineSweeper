@@ -84,8 +84,12 @@ public class Board {
                         Block block = (Block) view;
                         if(block.hasMine())
                             numOfGoodFlags++;
+                        if(block.isFlagged())
+                            numOfFlags++;
+                        else
+                            numOfFlags--;
                         block.markFlag();
-                        numOfFlags++;
+                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags);
                         return true;
 
 
