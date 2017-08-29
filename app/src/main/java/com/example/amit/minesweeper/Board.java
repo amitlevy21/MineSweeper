@@ -80,7 +80,7 @@ public class Board {
                         boardListener.onUpdate(numOfPressedBlocks, numOfFlags);
                     }
                 });
-
+//omg
                 blocks[i][j].setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
