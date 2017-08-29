@@ -34,10 +34,12 @@ public class Board {
     private Context context;
     private boolean won;
     private int seconds;
+    private  MainActivity.eDifficulty edifficulty;
 
 
 
-    public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines) {
+    public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines,
+                 MainActivity.eDifficulty edifficulty) {
 
         this.totalNumOfBlocks = boardSize * boardSize;
         blocks = new Block[boardSize][boardSize];
@@ -46,6 +48,7 @@ public class Board {
         this.gridLayout.setColumnCount(boardSize);
         this.numOfMines = numOfMines;
         this.context = context;
+        this.edifficulty = edifficulty;
 
         createBlocks(context, boardSize, buttonWidth);
         setMines();
@@ -105,11 +108,11 @@ public class Board {
 
         intent.putExtra(Keys.RESULT, won);
         intent.putExtra(Keys.TIME, seconds);
+        intent.putExtra(Keys.DIFFICULTY,edifficulty);
 
         intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
         intent.putExtra(Keys.GOOD_FLAGS, numOfGoodFlags);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         context.startActivity(intent);
         if(context instanceof Activity) {
