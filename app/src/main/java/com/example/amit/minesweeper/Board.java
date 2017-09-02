@@ -70,9 +70,9 @@ public class Board {
                         else if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) {
                             state = eState.WIN;
                         }
-
-                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
                         pressNeighbours(block.getRow(), block.getCol());
+                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
+
 
                     }
                 });
@@ -81,12 +81,12 @@ public class Board {
                     @Override
                     public boolean onLongClick(View view) {
                         Block block = (Block) view;
-                        if(block.hasMine())
+                        if(block.hasMine() && !block.isFlagged())
                             numOfGoodFlags++;
                         if(block.isFlagged())
-                            numOfFlags++;
-                        else
                             numOfFlags--;
+                        else
+                            numOfFlags++;
                         block.markFlag();
                         boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
                         return true;

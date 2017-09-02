@@ -1,5 +1,7 @@
 package com.example.amit.minesweeper;
 
+import android.animation.ObjectAnimator;
+import android.animation.TimeInterpolator;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Handler;
@@ -7,12 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
 import com.yalantis.starwars.TilesFrameLayout;
 import com.yalantis.starwars.interfaces.TilesFrameLayoutListener;
+
 
 
 public class PlayActivity extends AppCompatActivity implements Board.BoardListener, TilesFrameLayoutListener {
@@ -130,6 +134,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
             public void run() {
                 TextView textTime = (TextView) findViewById(R.id.timer);
                 textTime.setText(getString(R.string.play_activity_time) + " " + seconds);
+                seconds++;
             }
         });
 
@@ -148,20 +153,18 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
             }
         });
 
-        switch (state) {
-            case IN_PROGRESS: break;
-            case WIN:
-            case LOSE:
-                final Intent intent = new Intent(this, EndGameActivity.class);
+        if(state.equals(Board.eState.WIN) || state.equals(Board.eState.LOSE)) {
+            final Intent intent = new Intent(this, EndGameActivity.class);
 
-                intent.putExtra(Keys.RESULT, state);
-                intent.putExtra(Keys.TIME, seconds);
+            intent.putExtra(Keys.RESULT, state);
+            intent.putExtra(Keys.TIME, seconds);
 
 
-                intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
-                intent.putExtra(Keys.GOOD_FLAGS, numOfFlags);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
+            intent.putExtra(Keys.GOOD_FLAGS, numOfFlags);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
+            if(state.equals(Board.eState.LOSE)) {
                 mTilesFrameLayout.startAnimation();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -171,11 +174,14 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                     }
                 }, 1600);
 
-                break;
+            }
+            else { // WIN
+                AccelerateInterpolator accelerateInterpolator = new AccelerateInterpolator();
+                prepareObjectAnimator(accelerateInterpolator);
+            }
+
         }
     }
-
-
 
     @Override
     protected void onDestroy() {
@@ -185,11 +191,25 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
     @Override
     public void onAnimationFinished() {
-        endGame();
         finish();
     }
 
-    private void endGame() {
+    // TODO: 9/2/2017  
 
+    private void prepareObjectAnimator(TimeInterpolator timeInterpolator){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        String propertyName = "translationY";
+        ObjectAnimator objectAnimator
+                = ObjectAnimator.ofFloat(R.drawable.winning_icon, propertyName, 0, height);
+        objectAnimator.setDuration(2000);
+        objectAnimator.setRepeatCount(1);
+        objectAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+        objectAnimator.setInterpolator(timeInterpolator);
+        objectAnimator.start();
     }
+
 }
