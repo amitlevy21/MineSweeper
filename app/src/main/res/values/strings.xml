@@ -17,6 +17,7 @@
     <string name="lost_text">you have lost</string>
     <string name="won_text">you have won</string>
     <string name="play_activity_time">Time:</string>
+    <string name="not_played_yet">not played yet</string>
 
 
     <string-array name="difficulties_array">

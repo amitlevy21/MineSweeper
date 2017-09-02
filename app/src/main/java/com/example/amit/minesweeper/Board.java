@@ -16,11 +16,15 @@ public class Board {
 
     interface BoardListener {
 
-        void onUpdate(int numOfPressedBlocks, int numOfFlags);
+        void onUpdate(int numOfPressedBlocks, int numOfFlags, eState state);
     }
 
     public void setBoardListener(BoardListener boardListener) {
         this.boardListener = boardListener;
+    }
+
+    public enum eState {
+        IN_PROGRESS, WIN, LOSE
     }
 
     private BoardListener boardListener;
@@ -31,15 +35,11 @@ public class Board {
     private int numOfMines;
     private int numOfPressedBlocks;
     private int numOfGoodFlags;
-    private Context context;
-    private boolean won;
-    private int seconds;
-    private  MainActivity.eDifficulty edifficulty;
-
+    private eState state = eState.IN_PROGRESS;
 
 
     public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines,
-                 MainActivity.eDifficulty edifficulty) {
+                 MainActivity.eDifficulty eDifficulty) {
 
         this.totalNumOfBlocks = boardSize * boardSize;
         blocks = new Block[boardSize][boardSize];
@@ -47,8 +47,6 @@ public class Board {
         this.gridLayout.setRowCount(boardSize);
         this.gridLayout.setColumnCount(boardSize);
         this.numOfMines = numOfMines;
-        this.context = context;
-        this.edifficulty = edifficulty;
 
         createBlocks(context, boardSize, buttonWidth);
         setMines();
@@ -67,20 +65,18 @@ public class Board {
                     public void onClick(View view) {
                         Block block = (Block) view;
                         if (block.hasMine()) {
-                            won = false;
-                            endGame();
+                            state = eState.LOSE;
                         }
+                        else if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) {
+                            state = eState.WIN;
+                        }
+
+                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
                         pressNeighbours(block.getRow(), block.getCol());
 
-                        if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) {
-                            won = true;
-                            endGame();
-                        }
-
-                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags);
                     }
                 });
-//omg
+
                 blocks[i][j].setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
@@ -92,33 +88,14 @@ public class Board {
                         else
                             numOfFlags--;
                         block.markFlag();
-                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags);
+                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
                         return true;
-
-
                     }
                 });
             }
         }
     }
 
-
-    private void endGame(){
-        Intent intent = new Intent(context, EndGameActivity.class);
-
-        intent.putExtra(Keys.RESULT, won);
-        intent.putExtra(Keys.TIME, seconds);
-        intent.putExtra(Keys.DIFFICULTY,edifficulty);
-
-        intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
-        intent.putExtra(Keys.GOOD_FLAGS, numOfGoodFlags);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-        context.startActivity(intent);
-        if(context instanceof Activity) {
-            ((Activity)context).finish();
-        }
-    }
 
     private boolean addBlock(Block block, int row, int col) {
         if(row * gridLayout.getColumnCount() + col >= totalNumOfBlocks)
@@ -200,7 +177,4 @@ public class Board {
         return numOfGoodFlags;
     }
 
-    public void updateSecond(int seconds) {
-        this.seconds = seconds;
-    }
 }

@@ -2,6 +2,7 @@ package com.example.amit.minesweeper;
 
 import android.content.Intent;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Display;
@@ -10,8 +11,11 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import com.yalantis.starwars.TilesFrameLayout;
+import com.yalantis.starwars.interfaces.TilesFrameLayoutListener;
 
-public class PlayActivity extends AppCompatActivity implements Board.BoardListener {
+
+public class PlayActivity extends AppCompatActivity implements Board.BoardListener, TilesFrameLayoutListener {
 
     public static final int BIGGER_FRACTION = 6;
     public static final int SMALLER_FRACTION = 12;
@@ -20,6 +24,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private int seconds = 0;
 
     private Board board;
+    private TilesFrameLayout mTilesFrameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,21 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         board = buildBoard();
         tickEndlessly();
 
+        mTilesFrameLayout = (TilesFrameLayout) findViewById(R.id.tiles_frame_layout);
+        mTilesFrameLayout.setOnAnimationFinishedListener(this);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTilesFrameLayout.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTilesFrameLayout.onPause();
     }
 
     public Board buildBoard() {
@@ -62,7 +82,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
 
 
-        Board board = new Board(this, gridLayout, boardSize, buttonWidth, numOfMines);
+        Board board = new Board(this, gridLayout, boardSize, buttonWidth, numOfMines, difficulty);
         board.setBoardListener(this);
         return board;
     }
@@ -110,14 +130,13 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
             public void run() {
                 TextView textTime = (TextView) findViewById(R.id.timer);
                 textTime.setText(getString(R.string.play_activity_time) + " " + seconds);
-                board.updateSecond(seconds++);
             }
         });
 
     }
 
     @Override
-    public void onUpdate(int numOfPressedBlocks, int numOfFlags) {
+    public void onUpdate(int numOfPressedBlocks, int numOfFlags, Board.eState state) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -128,11 +147,49 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 CubesOnPlay.setText(getString(R.string.score) + " " + board.getNumOfPressedBlocks());
             }
         });
+
+        switch (state) {
+            case IN_PROGRESS: break;
+            case WIN:
+            case LOSE:
+                final Intent intent = new Intent(this, EndGameActivity.class);
+
+                intent.putExtra(Keys.RESULT, state);
+                intent.putExtra(Keys.TIME, seconds);
+
+
+                intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
+                intent.putExtra(Keys.GOOD_FLAGS, numOfFlags);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                mTilesFrameLayout.startAnimation();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(intent);
+                    }
+                }, 1600);
+
+                break;
+        }
     }
+
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         board.setBoardListener(null); // clear reference to the PlayActivity for garbage collector to clean
+    }
+
+    @Override
+    public void onAnimationFinished() {
+        endGame();
+        finish();
+    }
+
+    private void endGame() {
+
     }
 }

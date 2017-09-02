@@ -42,18 +42,28 @@
         android:layout_centerInParent="true"
         android:textColor="#FFFFFFFF" />
 
+    <com.yalantis.starwars.TilesFrameLayout
+        android:id="@+id/tiles_frame_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_above="@id/button_quit"
+        android:layout_below="@id/headline_layout"
+        app:sw_animationDuration="1500"
+        app:sw_numberOfTilesX="35">
+
+
     <GridLayout
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/button_quit"
-        android:layout_below="@id/headline_layout"
         android:layout_margin="@dimen/margin_default">
 
 
     </GridLayout>
+</com.yalantis.starwars.TilesFrameLayout>
 
-    <TextView
+
+<TextView
         android:id="@+id/timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

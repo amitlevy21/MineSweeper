@@ -15,13 +15,13 @@ public class EndGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_end_game);
 
         Bundle bundle = getIntent().getExtras();
-        boolean result = bundle.getBoolean(Keys.RESULT);
+        Board.eState result = (Board.eState) bundle.getSerializable(Keys.RESULT);
         int minutes =  bundle.getInt(Keys.TIME);
         int goodCubes = bundle.getInt(Keys.GOOD_CUBES);
         int goodFlags = bundle.getInt(Keys.GOOD_FLAGS);
         Button tryAgain = (Button) findViewById(R.id.try_again);
 
-        if (result) {
+        if (result.equals(Board.eState.WIN)) {
             TextView textResult = (TextView) findViewById(R.id.result);
             textResult.setText(getString(R.string.result) + " " + getString(R.string.won_text));
         } else {

@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         TextView difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
-        difficultyPlayed.setText(getString(R.string.last_mode_played) + " NOT PLAYED YET");
+        difficultyPlayed.setText(getString(R.string.last_mode_played) + getString(R.string.not_played_yet));
 
         final Spinner difficultySpinner = (Spinner) findViewById(R.id.difficulty_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulties_array,
