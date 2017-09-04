@@ -1,17 +1,25 @@
 package com.example.amit.minesweeper;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yalantis.starwars.TilesFrameLayout;
@@ -23,6 +31,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
     public static final int BIGGER_FRACTION = 6;
     public static final int SMALLER_FRACTION = 12;
+    private static final int DEFAULT_ANIMATION_DURATION = 1600;
 
 
     private int seconds = 0;
@@ -60,6 +69,8 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         mTilesFrameLayout = (TilesFrameLayout) findViewById(R.id.tiles_frame_layout);
         mTilesFrameLayout.setOnAnimationFinishedListener(this);
 
+
+
     }
 
     @Override
@@ -86,7 +97,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
 
 
-        Board board = new Board(this, gridLayout, boardSize, buttonWidth, numOfMines, difficulty);
+        Board board = new Board(this, gridLayout, boardSize, buttonWidth, numOfMines);
         board.setBoardListener(this);
         return board;
     }
@@ -166,19 +177,74 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
             if(state.equals(Board.eState.LOSE)) {
                 mTilesFrameLayout.startAnimation();
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        startActivity(intent);
-                    }
-                }, 1600);
-
             }
             else { // WIN
-                AccelerateInterpolator accelerateInterpolator = new AccelerateInterpolator();
-                prepareObjectAnimator(accelerateInterpolator);
+                Drawable image = getDrawable(R.drawable.win_chuck_norris_approved);
+                image.setAlpha(0);
+                GridLayout grid = (GridLayout) findViewById(R.id.grid);
+                final ImageView imageView = new ImageView(this);
+                imageView.setVisibility(View.GONE);
+                grid.addView(imageView);
+                //// TODO: 04/09/17
+                //GridLayout.LayoutParams lp = new GridLayout.LayoutParams(GridLayout.LayoutParams.MATCH_PARENT);
+
+                //imageView.setLayoutParams(lp);
+                imageView.setBackground(image);
+
+                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(imageView, "alpha", 0.0f, 1.0f);
+                fadeIn.setDuration(DEFAULT_ANIMATION_DURATION);
+                fadeIn.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+                        imageView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+
+                final Button quit = (Button) findViewById(R.id.button_quit);
+                DisplayMetrics displaymetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                int mScreenHeight = displaymetrics.heightPixels;
+
+                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
+
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+
+                        float value = (float) animation.getAnimatedValue();
+                        quit.setTranslationY(value);
+                    }
+                });
+
+                valueAnimator.setInterpolator(new LinearInterpolator());
+                valueAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
+                valueAnimator.start();
+                fadeIn.start();
+
             }
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                }
+            }, DEFAULT_ANIMATION_DURATION);
 
         }
     }
@@ -194,22 +260,5 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         finish();
     }
 
-    // TODO: 9/2/2017  
-
-    private void prepareObjectAnimator(TimeInterpolator timeInterpolator){
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
-        int height = size.y;
-        String propertyName = "translationY";
-        ObjectAnimator objectAnimator
-                = ObjectAnimator.ofFloat(R.drawable.winning_icon, propertyName, 0, height);
-        objectAnimator.setDuration(2000);
-        objectAnimator.setRepeatCount(1);
-        objectAnimator.setRepeatMode(ObjectAnimator.REVERSE);
-        objectAnimator.setInterpolator(timeInterpolator);
-        objectAnimator.start();
-    }
 
 }

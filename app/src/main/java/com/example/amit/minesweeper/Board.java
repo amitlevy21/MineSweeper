@@ -1,8 +1,6 @@
 package com.example.amit.minesweeper;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -38,8 +36,7 @@ public class Board {
     private eState state = eState.IN_PROGRESS;
 
 
-    public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines,
-                 MainActivity.eDifficulty eDifficulty) {
+    public Board(Context context, GridLayout gridLayout, int boardSize, int buttonWidth, int numOfMines) {
 
         this.totalNumOfBlocks = boardSize * boardSize;
         blocks = new Block[boardSize][boardSize];
@@ -64,13 +61,14 @@ public class Board {
                     @Override
                     public void onClick(View view) {
                         Block block = (Block) view;
+                        pressNeighbours(block.getRow(), block.getCol());
                         if (block.hasMine()) {
                             state = eState.LOSE;
                         }
                         else if(numOfPressedBlocks == totalNumOfBlocks - numOfMines) {
                             state = eState.WIN;
                         }
-                        pressNeighbours(block.getRow(), block.getCol());
+
                         boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
 
 
@@ -81,14 +79,16 @@ public class Board {
                     @Override
                     public boolean onLongClick(View view) {
                         Block block = (Block) view;
-                        if(block.hasMine() && !block.isFlagged())
-                            numOfGoodFlags++;
-                        if(block.isFlagged())
-                            numOfFlags--;
-                        else
-                            numOfFlags++;
-                        block.markFlag();
-                        boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
+                        if(!block.getIsPressed()) {
+                            if (block.hasMine() && !block.isFlagged())
+                                numOfGoodFlags++;
+                            if (block.isFlagged())
+                                numOfFlags--;
+                            else
+                                numOfFlags++;
+                            block.markFlag();
+                            boardListener.onUpdate(numOfPressedBlocks, numOfFlags, state);
+                        }
                         return true;
                     }
                 });
