@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -51,7 +52,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
             public void onClick(View view) {
 
                 Intent intent = new Intent(view.getContext(), EndGameActivity.class);
-                intent.putExtra(Keys.RESULT, false);
+                intent.putExtra(Keys.RESULT, Board.eState.LOSE);
                 intent.putExtra(Keys.TIME, seconds);
                 int cubes = board.getNumOfPressedBlocks();
                 int goodFlags = board.getNumOfGoodFlags();
@@ -179,12 +180,21 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 mTilesFrameLayout.startAnimation();
             }
             else { // WIN
-                Drawable image = getDrawable(R.drawable.win_chuck_norris_approved);
-                image.setAlpha(0);
+                DisplayMetrics displaymetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                int mScreenHeight = displaymetrics.heightPixels;
+
+                Drawable image = ContextCompat.getDrawable(this,R.drawable.win_chuck_norris_approved);
+                //image.setAlpha(0);
+
                 GridLayout grid = (GridLayout) findViewById(R.id.grid);
                 final ImageView imageView = new ImageView(this);
-                imageView.setVisibility(View.GONE);
-                grid.addView(imageView);
+                //grid.addView(imageView);
+                grid.addView(imageView,GridLayout.LayoutParams.MATCH_PARENT);
+                imageView.setVisibility(View.VISIBLE);
+
+
+
                 //// TODO: 04/09/17
                 //GridLayout.LayoutParams lp = new GridLayout.LayoutParams(GridLayout.LayoutParams.MATCH_PARENT);
 
@@ -197,6 +207,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                     @Override
                     public void onAnimationStart(Animator animator) {
                         imageView.setVisibility(View.VISIBLE);
+
                     }
 
                     @Override
@@ -214,11 +225,10 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
                     }
                 });
+                fadeIn.start();
 
                 final Button quit = (Button) findViewById(R.id.button_quit);
-                DisplayMetrics displaymetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                int mScreenHeight = displaymetrics.heightPixels;
+                quit.setClickable(false); //prevent user clicking while moving
 
                 ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
 
@@ -234,7 +244,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 valueAnimator.setInterpolator(new LinearInterpolator());
                 valueAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
                 valueAnimator.start();
-                fadeIn.start();
+
 
             }
 
