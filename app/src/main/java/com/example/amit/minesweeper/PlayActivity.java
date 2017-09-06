@@ -21,6 +21,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yalantis.starwars.TilesFrameLayout;
@@ -165,97 +166,97 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
             }
         });
 
-        if(state.equals(Board.eState.WIN) || state.equals(Board.eState.LOSE)) {
-            final Intent intent = new Intent(this, EndGameActivity.class);
+        boolean runOnce = false; // prevent clicking to enter the following if
 
-            intent.putExtra(Keys.RESULT, state);
-            intent.putExtra(Keys.TIME, seconds);
+        if(!runOnce) {
+            runOnce = true;
+            if (state.equals(Board.eState.WIN) || state.equals(Board.eState.LOSE)) {
+                final Intent intent = new Intent(this, EndGameActivity.class);
 
-
-            intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
-            intent.putExtra(Keys.GOOD_FLAGS, numOfFlags);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-            if(state.equals(Board.eState.LOSE)) {
-                mTilesFrameLayout.startAnimation();
-            }
-            else { // WIN
-                DisplayMetrics displaymetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                int mScreenHeight = displaymetrics.heightPixels;
-
-                Drawable image = ContextCompat.getDrawable(this,R.drawable.win_chuck_norris_approved);
-                //image.setAlpha(0);
-
-                GridLayout grid = (GridLayout) findViewById(R.id.grid);
-                final ImageView imageView = new ImageView(this);
-                //grid.addView(imageView);
-                grid.addView(imageView,GridLayout.LayoutParams.MATCH_PARENT);
-                imageView.setVisibility(View.VISIBLE);
+                intent.putExtra(Keys.RESULT, state);
+                intent.putExtra(Keys.TIME, seconds);
 
 
+                intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
+                intent.putExtra(Keys.GOOD_FLAGS, numOfFlags);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-                //// TODO: 04/09/17
-                //GridLayout.LayoutParams lp = new GridLayout.LayoutParams(GridLayout.LayoutParams.MATCH_PARENT);
+                if (state.equals(Board.eState.LOSE)) {
+                    mTilesFrameLayout.startAnimation();
+                } else { // WIN
+                    DisplayMetrics displaymetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                    int mScreenHeight = displaymetrics.heightPixels;
 
-                //imageView.setLayoutParams(lp);
-                imageView.setBackground(image);
-
-                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(imageView, "alpha", 0.0f, 1.0f);
-                fadeIn.setDuration(DEFAULT_ANIMATION_DURATION);
-                fadeIn.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                        imageView.setVisibility(View.VISIBLE);
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                });
-                fadeIn.start();
-
-                final Button quit = (Button) findViewById(R.id.button_quit);
-                quit.setClickable(false); //prevent user clicking while moving
-
-                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
-
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-
-                        float value = (float) animation.getAnimatedValue();
-                        quit.setTranslationY(value);
-                    }
-                });
-
-                valueAnimator.setInterpolator(new LinearInterpolator());
-                valueAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
-                valueAnimator.start();
+                    Drawable image = ContextCompat.getDrawable(this, R.drawable.ic_chuck_norris_approved);
 
 
-            }
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.play_main_layout);
+                    final ImageView imageView = new ImageView(this);
+                    imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT));
+                    imageView.setVisibility(View.VISIBLE);
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
+                    imageView.setBackground(image);
+                    relativeLayout.addView(imageView);
+
+
+
+                    ObjectAnimator fadeIn = ObjectAnimator.ofFloat(imageView, "alpha", 0.0f, 1.0f);
+                    fadeIn.setDuration(DEFAULT_ANIMATION_DURATION);
+                    fadeIn.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+                            imageView.setVisibility(View.VISIBLE);
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    });
+                    fadeIn.start();
+
+                    final Button quit = (Button) findViewById(R.id.button_quit);
+                    quit.setClickable(false);
+
+                    ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
+
+                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+
+                            float value = (float) animation.getAnimatedValue();
+                            quit.setTranslationY(value);
+                        }
+                    });
+
+                    valueAnimator.setInterpolator(new LinearInterpolator());
+                    valueAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
+                    valueAnimator.start();
+
+
                 }
-            }, DEFAULT_ANIMATION_DURATION);
 
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(intent);
+                    }
+                }, DEFAULT_ANIMATION_DURATION);
+
+            }
         }
     }
 
