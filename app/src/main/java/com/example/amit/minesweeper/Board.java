@@ -177,4 +177,7 @@ public class Board {
         return numOfGoodFlags;
     }
 
+    public eState getState() {
+        return state;
+    }
 }

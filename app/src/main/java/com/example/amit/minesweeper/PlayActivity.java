@@ -130,7 +130,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (board.getState() == Board.eState.IN_PROGRESS) {
                     tick();
                     try {
                         Thread.sleep(1000);
@@ -171,6 +171,8 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
 
         if(!runOnce) {
+            final Button quit = (Button) findViewById(R.id.button_quit);
+            quit.setClickable(false);
 
             if (state.equals(Board.eState.WIN) || state.equals(Board.eState.LOSE)) {
                 runOnce = true;
@@ -230,8 +232,6 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                     });
                     fadeIn.start();
 
-                    final Button quit = (Button) findViewById(R.id.button_quit);
-                    quit.setClickable(false);
 
                     ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
 
