@@ -35,6 +35,8 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     public static final int SMALLER_FRACTION = 12;
     private static final int DEFAULT_ANIMATION_DURATION = 1600;
 
+    boolean runOnce = false; // prevent clicking to enter the following if
+
 
     private int seconds = 0;
 
@@ -166,11 +168,12 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
             }
         });
 
-        boolean runOnce = false; // prevent clicking to enter the following if
+
 
         if(!runOnce) {
-            runOnce = true;
+
             if (state.equals(Board.eState.WIN) || state.equals(Board.eState.LOSE)) {
+                runOnce = true;
                 final Intent intent = new Intent(this, EndGameActivity.class);
 
                 intent.putExtra(Keys.RESULT, state);
