@@ -18,6 +18,13 @@
     <string name="won_text">you have won</string>
     <string name="play_activity_time">Time:</string>
     <string name="not_played_yet">not played yet</string>
+    <string name="leader_board_easy">Easy</string>
+    <string name="leader_board_medium">Medium</string>
+    <string name="leader_board_hard">Hard</string>
+    <string name="leader_board_rank">Rank</string>
+    <string name="leader_board_name">Name</string>
+    <string name="leader_board_score">Score</string>
+    <string name="leader_board_time">Time</string>
 
 
     <string-array name="difficulties_array">
