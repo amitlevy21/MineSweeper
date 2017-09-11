@@ -64,7 +64,13 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
             mapsPlaceHolder.addView(errorMessageTextView);
         }
 
-        getCurrentLocation();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                //googleMap.setMyLocationEnabled(true);
+                //getCurrentLocation();
+            }
+        }
 
     }
 
