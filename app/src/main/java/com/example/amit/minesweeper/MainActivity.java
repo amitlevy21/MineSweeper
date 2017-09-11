@@ -1,6 +1,9 @@
 package com.example.amit.minesweeper;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +15,9 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    private boolean didAlreadyRequestLocationPermission;
+    public static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
     public enum eDifficulty {
         EASY, INTERMEDIATE, HARD
@@ -30,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         TextView difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
-        difficultyPlayed.setText(getString(R.string.last_mode_played) + getString(R.string.not_played_yet));
+        difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + getString(R.string.not_played_yet));
 
         final Spinner difficultySpinner = (Spinner) findViewById(R.id.difficulty_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulties_array,
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             difficultyPlayed = (TextView) findViewById(R.id.last_mode_played);
             difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifficulty);
         }
+        askPermissions();
     }
 
     @Override
@@ -86,6 +93,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onNothingSelected(AdapterView<?> adapterView) {
 
         adapterView.setSelection(0);
+    }
+
+    public void askPermissions() {
+        boolean isAccessGranted;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+            String coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION;
+            if (getApplicationContext().checkSelfPermission(fineLocationPermission) != PackageManager.PERMISSION_GRANTED ||
+                    getApplicationContext().checkSelfPermission(coarseLocationPermission) != PackageManager.PERMISSION_GRANTED) {
+                // The user blocked the location services of THIS app / not yet approved
+                isAccessGranted = false;
+                if (!didAlreadyRequestLocationPermission) {
+                    didAlreadyRequestLocationPermission = true;
+                    String[] permissionsToAsk = new String[]{fineLocationPermission, coarseLocationPermission};
+                    requestPermissions(permissionsToAsk, LOCATION_PERMISSION_REQUEST_CODE);
+                }
+            } else {
+
+                isAccessGranted = true;
+            }
+        }
     }
 
 
