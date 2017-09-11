@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 int difficulty = difficultySpinner.getSelectedItemPosition();
                 eDifficulty[] difficulties = eDifficulty.values();
 
-                Intent intent = new Intent(view.getContext(), PlayActivity.class);
+                Intent intent = new Intent(view.getContext(), LeaderBoardActivity.class);
                 intent.putExtra(Keys.DIFFICULTY, difficulties[difficulty]);
                 intent.putExtra(Keys.BOARD_SIZE, BOARD_SIZE[difficulty]);
                 intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
