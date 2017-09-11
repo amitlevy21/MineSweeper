@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,13 +25,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 
 public class LeaderBoardActivity extends AppCompatActivity implements LocationListener{
 
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = -100;
-    private static final String API_KEY = "AIzaSyBgE5dhgTuqZ9HlrdHzORNroU1sL04oY9Y";
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
+    private static final String API_KEY = "AIzaSyCVyXqNtRzG5HYTbIJxUn0d_FoD-SGHNnM";
 
     private LocationManager locationManager;
     private boolean didAlreadyRequestLocationPermission;
     private Location currentLocation;
     private GoogleMap googleMap;
+    private LeaderBoard leaderBoard;
 
 
     @Override
@@ -38,7 +40,9 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leader_board);
 
-        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        RadioGroup difficultyRadioGroup = (RadioGroup) findViewById(R.id.difficulty_radio_group);
+        difficultyRadioGroup.check(difficultyRadioGroup.getChildAt(0).getId());
+
 
         if (isGoogleMapsInstalled()) {
             // Add the Google Maps fragment dynamically
@@ -64,14 +68,14 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
             mapsPlaceHolder.addView(errorMessageTextView);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                //googleMap.setMyLocationEnabled(true);
-                //getCurrentLocation();
-            }
-        }
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getCurrentLocation();
     }
 
     //Thanks Perry
@@ -88,7 +92,7 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
                 if (!didAlreadyRequestLocationPermission) {
                     didAlreadyRequestLocationPermission = true;
                     String[] permissionsToAsk = new String[]{fineLocationPermission, coarseLocationPermission};
-                    requestPermissions(permissionsToAsk, LOCATION_PERMISSION_REQUEST_CODE);
+                    requestPermissions(permissionsToAsk,LOCATION_PERMISSION_REQUEST_CODE);
                 }
             } else {
 
@@ -167,5 +171,10 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
         }
 
         return true;
+    }
+    
+    public void loadLeaders() {
+        leaderBoard = LeaderBoard.getInstance();
+        // TODO: 9/11/2017  
     }
 }
