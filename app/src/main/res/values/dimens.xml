@@ -2,4 +2,6 @@
 <resources>
     <dimen name="text_default">20sp</dimen>
     <dimen name="margin_default">16dp</dimen>
+    <dimen name="close_margin">40dp</dimen>
+    <dimen name="far_margin">200dp</dimen>
 </resources>

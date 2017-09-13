@@ -20,6 +20,7 @@ public class EndGameActivity extends AppCompatActivity {
         int goodCubes = bundle.getInt(Keys.GOOD_CUBES);
         int goodFlags = bundle.getInt(Keys.GOOD_FLAGS);
         Button tryAgain = (Button) findViewById(R.id.try_again);
+        Button leaderBoard = (Button) findViewById(R.id.button_leader_board);
 
         if (result.equals(Board.eState.WIN)) {
             TextView textResult = (TextView) findViewById(R.id.result);
@@ -48,6 +49,15 @@ public class EndGameActivity extends AppCompatActivity {
 
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        leaderBoard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(view.getContext(), LeaderBoardActivity.class);
+                startActivity(intent);
             }
         });
     }

@@ -6,6 +6,8 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +41,18 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private Board board;
     private TilesFrameLayout mTilesFrameLayout;
 
+
+
+
+    ///////motion sensor
+    private SensorManager sensorMan;
+    private Sensor accelerometer;
+
+    private float[] mGravity;
+    private float mAccel;
+    private float mAccelCurrent;
+    private float mAccelLast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +83,14 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         mTilesFrameLayout = (TilesFrameLayout) findViewById(R.id.tiles_frame_layout);
         mTilesFrameLayout.setOnAnimationFinishedListener(this);
 
+
+
+        //////////sensor
+        sensorMan = (SensorManager)getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorMan.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mAccel = 0.00f;
+        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+        mAccelLast = SensorManager.GRAVITY_EARTH;
 
 
     }

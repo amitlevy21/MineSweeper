@@ -6,6 +6,7 @@
     <string name="screen_size">Screen size:</string>
     <string name="num_mines">Number of mines:</string>
     <string name="start_game">Start!</string>
+    <string name="leader_board">LeaderBoard</string>
     <string name="score">Score:</string>
     <string name="flags">Flags:</string>
     <string name="quit">Quit</string>

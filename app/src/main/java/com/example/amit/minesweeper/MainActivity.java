@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         difficultySpinner.setOnItemSelectedListener(this);
 
         Button start = (Button) findViewById(R.id.button_start);
+        Button leaderBoard = (Button) findViewById(R.id.button_leader_board);
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 int difficulty = difficultySpinner.getSelectedItemPosition();
                 eDifficulty[] difficulties = eDifficulty.values();
 
-                Intent intent = new Intent(view.getContext(), LeaderBoardActivity.class);
+                Intent intent = new Intent(view.getContext(), PlayActivity.class);
                 intent.putExtra(Keys.DIFFICULTY, difficulties[difficulty]);
                 intent.putExtra(Keys.BOARD_SIZE, BOARD_SIZE[difficulty]);
                 intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
@@ -66,6 +67,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 played = true;
                 startActivity(intent);
 
+            }
+        });
+
+        leaderBoard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(view.getContext(), LeaderBoardActivity.class);
+                startActivity(intent);
             }
         });
 

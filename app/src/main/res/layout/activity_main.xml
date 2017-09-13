@@ -65,7 +65,16 @@
         android:layout_height="wrap_content"
         android:text="@string/start_game"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
+        android:textColor="#FFFFFFFF"
+        android:layout_marginLeft="@dimen/far_margin" />
+
+    <Button
+        android:id="@+id/button_leader_board"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/leader_board"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/close_margin"
         android:textColor="#FFFFFFFF" />
 
 
