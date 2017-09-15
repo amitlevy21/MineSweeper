@@ -1,5 +1,8 @@
 package com.example.amit.minesweeper;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class LeaderBoard {
     private static final LeaderBoard ourInstance = new LeaderBoard();
 
@@ -45,6 +48,10 @@ public class LeaderBoard {
         }
         else
             return false;
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("Hello, World!");
         return true;
     }
 }

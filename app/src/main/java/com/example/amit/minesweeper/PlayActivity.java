@@ -65,6 +65,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private float mAccelLast;
     private LeaderBoard leaderBoard;
     private MainActivity.eDifficulty difficulty;
+    private Button quit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +211,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
 
         if(!runOnce) { //prevent clicking while showing animation
-            final Button quit = (Button) findViewById(R.id.button_quit);
+            quit = (Button) findViewById(R.id.button_quit);
             quit.setClickable(false);
 
             if (state.equals(Board.eState.WIN) || state.equals(Board.eState.LOSE)) {
@@ -227,6 +228,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
                 if (state.equals(Board.eState.LOSE)) {
                     mTilesFrameLayout.startAnimation();
+                    presentMainActivity(intent);
                 } else { // WIN
 
                     leaderBoard = LeaderBoard.getInstance();
@@ -235,96 +237,100 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
                         final EditText et = new EditText(this);
-                        et.setText(R.string.new_leader);
 
-                        // set prompts.xml to alertdialog builder
                         alertDialogBuilder.setView(et);
+                        alertDialogBuilder.setTitle(R.string.new_leader);
 
-                        // set dialog message
                         alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 leaderBoard.addPlayer(difficulty,new PlayerScore(et.toString(),numOfPressedBlocks, currentLocation));
                             }
                         });
 
-                        // create alert dialog
                         AlertDialog alertDialog = alertDialogBuilder.create();
-                        // show it
+                        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialogInterface) {
+                                animateWin();
+                                presentMainActivity(intent);
+                            }
+                        });
                         alertDialog.show();
-
                     }
-                    DisplayMetrics displaymetrics = new DisplayMetrics();
-                    getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                    int mScreenHeight = displaymetrics.heightPixels;
-
-                    Drawable image = ContextCompat.getDrawable(this, R.drawable.ic_chuck_norris_approved);
-
-
-                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.play_main_layout);
-                    final ImageView imageView = new ImageView(this);
-                    imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT));
-                    imageView.setVisibility(View.VISIBLE);
-
-                    imageView.setBackground(image);
-                    relativeLayout.addView(imageView);
-
-
-
-                    ObjectAnimator fadeIn = ObjectAnimator.ofFloat(imageView, "alpha", 0.0f, 1.0f);
-                    fadeIn.setDuration(DEFAULT_ANIMATION_DURATION);
-                    fadeIn.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-                            imageView.setVisibility(View.VISIBLE);
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
-                    fadeIn.start();
-
-
-                    ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
-
-                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-
-                            float value = (float) animation.getAnimatedValue();
-                            quit.setTranslationY(value);
-                        }
-                    });
-
-                    valueAnimator.setInterpolator(new LinearInterpolator());
-                    valueAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
-                    valueAnimator.start();
-
-
                 }
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        startActivity(intent);
-                    }
-                }, DEFAULT_ANIMATION_DURATION);
-
             }
         }
+    }
+
+    private void animateWin() {
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int mScreenHeight = displaymetrics.heightPixels;
+
+        Drawable image = ContextCompat.getDrawable(this, R.drawable.ic_chuck_norris_approved);
+
+
+        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.play_main_layout);
+        final ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT));
+        imageView.setVisibility(View.VISIBLE);
+
+        imageView.setBackground(image);
+        relativeLayout.addView(imageView);
+
+
+
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(imageView, "alpha", 0.0f, 1.0f);
+        fadeIn.setDuration(DEFAULT_ANIMATION_DURATION);
+        fadeIn.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                imageView.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        fadeIn.start();
+
+
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, -mScreenHeight);
+
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+
+                float value = (float) animation.getAnimatedValue();
+                quit.setTranslationY(value);
+            }
+        });
+
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
+        valueAnimator.start();
+    }
+
+    private void presentMainActivity(final Intent intent) {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(intent);
+            }
+        }, DEFAULT_ANIMATION_DURATION);
     }
 
     @Override
