@@ -7,6 +7,7 @@ public class LeaderBoard {
     public static final int NUM_OF_DIFFICULTIES = 3;
     private PlayerScore[][] playerScores; //first array is the difficulty
                                             // sorted ascending by the scores
+    private int[] currentNumOfLeaders;
 
 
     public static LeaderBoard getInstance() {
@@ -15,33 +16,35 @@ public class LeaderBoard {
 
     private LeaderBoard() {
         playerScores = new PlayerScore[NUM_OF_DIFFICULTIES][NUM_OF_LEADERS];
-
+        currentNumOfLeaders = new int[NUM_OF_DIFFICULTIES];
     }
 
-    /** checks if player is a rightful leader, adds him to the leader board if so. */
-    public boolean isLeader(MainActivity.eDifficulty difficulty,PlayerScore playerScore) {
+
+    public boolean isLeader(MainActivity.eDifficulty difficulty,int playerScore) {
         int difficultyIndex = difficulty.ordinal();
-        if( playerScore.getScore() >
-                playerScores[difficultyIndex][playerScores.length - 1].getScore()) {
-            addPlayer(difficulty, playerScore);
+        if(currentNumOfLeaders[difficultyIndex] > 0)
+        return playerScore >
+                playerScores[difficultyIndex][currentNumOfLeaders[difficultyIndex] - 1].getScore();
+        else
             return true;
-        }
-        return false;
     }
 
-    private boolean addPlayer(MainActivity.eDifficulty difficulty, PlayerScore playerScore) {
+    public boolean addPlayer(MainActivity.eDifficulty difficulty, PlayerScore playerScore) {
         int difficultyIndex = difficulty.ordinal();
         int i = 0;
-        while(playerScores[difficultyIndex][i].getScore() >= playerScore.getScore()) {
+        while(i < currentNumOfLeaders[difficultyIndex] && playerScores[difficultyIndex][i].getScore() >= playerScore.getScore()) {
             i++;
         }
-        if(i == playerScores.length - 1) {
-            playerScores[difficultyIndex][i] = playerScore;
+        if(i < currentNumOfLeaders[difficultyIndex]) {
+            if(i == playerScores[difficultyIndex].length - 1)
+                playerScores[difficultyIndex][i] = playerScore;
+            else{
+                playerScores[difficultyIndex][i + 1] = playerScores[difficultyIndex][i];
+                playerScores[difficultyIndex][i] = playerScore;
+            }
         }
-        else {
-            playerScores[difficultyIndex][i + 1] = playerScores[difficultyIndex][i];
-            playerScores[difficultyIndex][i] = playerScore;
-        }
+        else
+            return false;
         return true;
     }
 }

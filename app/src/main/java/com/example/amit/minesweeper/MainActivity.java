@@ -106,23 +106,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void askPermissions() {
-        boolean isAccessGranted;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION;
             String coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION;
             if (getApplicationContext().checkSelfPermission(fineLocationPermission) != PackageManager.PERMISSION_GRANTED ||
                     getApplicationContext().checkSelfPermission(coarseLocationPermission) != PackageManager.PERMISSION_GRANTED) {
                 // The user blocked the location services of THIS app / not yet approved
-                isAccessGranted = false;
                 if (!didAlreadyRequestLocationPermission) {
                     didAlreadyRequestLocationPermission = true;
                     String[] permissionsToAsk = new String[]{fineLocationPermission, coarseLocationPermission};
                     requestPermissions(permissionsToAsk, LOCATION_PERMISSION_REQUEST_CODE);
                 }
-            } else {
-
-                isAccessGranted = true;
             }
         }
     }

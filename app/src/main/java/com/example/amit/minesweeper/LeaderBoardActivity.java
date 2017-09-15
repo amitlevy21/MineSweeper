@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,14 +20,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
-public class LeaderBoardActivity extends AppCompatActivity implements LocationListener{
+public class LeaderBoardActivity extends AppCompatActivity {
 
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
     private static final String API_KEY = "AIzaSyCVyXqNtRzG5HYTbIJxUn0d_FoD-SGHNnM";
 
-    private LocationManager locationManager;
-    private boolean didAlreadyRequestLocationPermission;
-    private Location currentLocation;
     private GoogleMap googleMap;
     private LeaderBoard leaderBoard;
 
@@ -63,74 +56,17 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
             FrameLayout mapsPlaceHolder = (FrameLayout) findViewById(R.id.mapsPlaceHolder);
             TextView errorMessageTextView = new TextView(getApplicationContext());
             errorMessageTextView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-            errorMessageTextView.setText("ERROR");
+            errorMessageTextView.setText(R.string.maps_notification_error);
             errorMessageTextView.setTextColor(Color.RED);
             mapsPlaceHolder.addView(errorMessageTextView);
         }
-
-        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        getCurrentLocation();
-    }
-
-    //Thanks Perry
-    private void getCurrentLocation() {
-        boolean isAccessGranted;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION;
-            String coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION;
-            if (getApplicationContext().checkSelfPermission(fineLocationPermission) != PackageManager.PERMISSION_GRANTED ||
-                    getApplicationContext().checkSelfPermission(coarseLocationPermission) != PackageManager.PERMISSION_GRANTED) {
-                // The user blocked the location services of THIS app / not yet approved
-                isAccessGranted = false;
-                if (!didAlreadyRequestLocationPermission) {
-                    didAlreadyRequestLocationPermission = true;
-                    String[] permissionsToAsk = new String[]{fineLocationPermission, coarseLocationPermission};
-                    requestPermissions(permissionsToAsk,LOCATION_PERMISSION_REQUEST_CODE);
-                }
-            } else {
-
-                isAccessGranted = true;
-            }
-
-
-            if (currentLocation == null) {
-                currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-
-
-            if (isAccessGranted) {
-                float metersToUpdate = 1;
-                long intervalMilliseconds = 1000;
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, intervalMilliseconds, metersToUpdate, this);
-            }
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
+        //getCurrentLocation();
     }
 
     public boolean isGoogleMapsInstalled() {
@@ -160,17 +96,8 @@ public class LeaderBoardActivity extends AppCompatActivity implements LocationLi
     }
 
     public static boolean hasPermissionForLocationServices(Context context) {
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            // Because the user's permissions started only from Android M and on...
-            return true;
-        }
-
-        if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // The user blocked the location services of THIS app
-            return false;
-        }
-
-        return true;
+        // Because the user's permissions started only from Android M and on...
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !(context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
     }
     
     public void loadLeaders() {

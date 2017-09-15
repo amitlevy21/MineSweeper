@@ -26,6 +26,8 @@
     <string name="leader_board_name">Name</string>
     <string name="leader_board_score">Score</string>
     <string name="leader_board_time">Time</string>
+    <string name="maps_notification_error">Please install google maps to use this feature</string>
+    <string name="new_leader">Congrats! you made it to the leader Board!</string>
 
 
     <string-array name="difficulties_array">

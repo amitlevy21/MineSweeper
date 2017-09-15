@@ -1,15 +1,23 @@
 package com.example.amit.minesweeper;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -17,6 +25,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -27,11 +36,12 @@ import com.yalantis.starwars.interfaces.TilesFrameLayoutListener;
 
 
 
-public class PlayActivity extends AppCompatActivity implements Board.BoardListener, TilesFrameLayoutListener {
+public class PlayActivity extends AppCompatActivity implements Board.BoardListener, TilesFrameLayoutListener, LocationListener {
 
     public static final int BIGGER_FRACTION = 6;
     public static final int SMALLER_FRACTION = 12;
     private static final int DEFAULT_ANIMATION_DURATION = 1600;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
     boolean runOnce = false; // prevent clicking to enter the following if
 
@@ -41,8 +51,9 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private Board board;
     private TilesFrameLayout mTilesFrameLayout;
 
-
-
+    private LocationManager locationManager;
+    private boolean didAlreadyRequestLocationPermission;
+    private Location currentLocation;
 
     ///////motion sensor
     private SensorManager sensorMan;
@@ -52,11 +63,16 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private float mAccel;
     private float mAccelCurrent;
     private float mAccelLast;
+    private LeaderBoard leaderBoard;
+    private MainActivity.eDifficulty difficulty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
+
+        Bundle bundle = getIntent().getExtras();
+        difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
 
         Button quit = (Button) findViewById(R.id.button_quit);
 
@@ -99,6 +115,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     protected void onResume() {
         super.onResume();
         mTilesFrameLayout.onResume();
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
     }
 
     @Override
@@ -174,7 +191,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     }
 
     @Override
-    public void onUpdate(int numOfPressedBlocks, int numOfFlags, Board.eState state) {
+    public void onUpdate(final int numOfPressedBlocks, int numOfFlags, Board.eState state) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -188,7 +205,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
 
 
-        if(!runOnce) {
+        if(!runOnce) { //prevent clicking while showing animation
             final Button quit = (Button) findViewById(R.id.button_quit);
             quit.setClickable(false);
 
@@ -207,6 +224,31 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 if (state.equals(Board.eState.LOSE)) {
                     mTilesFrameLayout.startAnimation();
                 } else { // WIN
+
+                    leaderBoard = LeaderBoard.getInstance();
+                    boolean leader = leaderBoard.isLeader(difficulty,numOfPressedBlocks);
+                    if (leader) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+                        final EditText et = new EditText(this);
+                        et.setText(R.string.new_leader);
+
+                        // set prompts.xml to alertdialog builder
+                        alertDialogBuilder.setView(et);
+
+                        // set dialog message
+                        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                leaderBoard.addPlayer(difficulty,new PlayerScore(et.toString(),numOfPressedBlocks, currentLocation));
+                            }
+                        });
+
+                        // create alert dialog
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        // show it
+                        alertDialog.show();
+
+                    }
                     DisplayMetrics displaymetrics = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
                     int mScreenHeight = displaymetrics.heightPixels;
@@ -292,5 +334,59 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         finish();
     }
 
+    //Thanks Perry
+    private void getCurrentLocation() {
+        boolean isAccessGranted;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+            String coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION;
+            if (getApplicationContext().checkSelfPermission(fineLocationPermission) != PackageManager.PERMISSION_GRANTED ||
+                    getApplicationContext().checkSelfPermission(coarseLocationPermission) != PackageManager.PERMISSION_GRANTED) {
+                // The user blocked the location services of THIS app / not yet approved
+                isAccessGranted = false;
+                if (!didAlreadyRequestLocationPermission) {
+                    didAlreadyRequestLocationPermission = true;
+                    String[] permissionsToAsk = new String[]{fineLocationPermission, coarseLocationPermission};
+                    requestPermissions(permissionsToAsk,LOCATION_PERMISSION_REQUEST_CODE);
+                }
+            } else {
+
+                isAccessGranted = true;
+            }
+
+
+            if (currentLocation == null) {
+                currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+
+
+            if (isAccessGranted) {
+                float metersToUpdate = 1;
+                long intervalMilliseconds = 1000;
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, intervalMilliseconds, metersToUpdate, this);
+            }
+        }
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
 }
