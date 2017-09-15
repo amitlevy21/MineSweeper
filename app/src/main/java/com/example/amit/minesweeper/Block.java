@@ -33,6 +33,10 @@ public class Block extends AppCompatButton{
         return isPressed;
     }
 
+    public void setIsPressed(boolean press) { // do not override isPressed by View class
+        this.isPressed = press;
+    }
+
     public int getNumOfMinesAround() {
         return numOfMinesAround;
     }

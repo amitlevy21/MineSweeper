@@ -124,6 +124,10 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         return board;
     }
 
+    public void updateBoard() {
+        board.changeBoard();
+    }
+
 
     public int calculateButtonSize(MainActivity.eDifficulty difficulty) {
         Display display = getWindowManager().getDefaultDisplay();
