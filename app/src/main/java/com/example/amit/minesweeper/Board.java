@@ -135,11 +135,14 @@ public class Board {
     public void changeBoard() {
         int counter = 5;
         int mineCounter = 0;
+        numOfPressedBlocks=0;
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[i].length; j++) {
-                if (blocks[i][j].getIsPressed())
+                if (blocks[i][j].getIsPressed()) {
                     blocks[i][j].setIsPressed(false);
-                if (blocks[i][j].hasMine())
+                    blocks[i][j].paintGray();
+                }
+                else if (blocks[i][j].hasMine())
                     mineCounter++;
             }
         }
@@ -152,6 +155,7 @@ public class Board {
                 mineCounter++;
             }
         }
+        updateNumOfMinesAround();
     }
 
     private boolean addMines(int i, int j) {
@@ -160,6 +164,15 @@ public class Board {
             return true;
         }
         return false;
+    }
+
+    public void updateNumOfMinesAround() {
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[i].length; j++) {
+                int mines = numOfMinesAround(i, j);
+                blocks[i][j].setNumOfMinesAround(mines);
+            }
+        }
     }
 
     private int numOfMinesAround(int row, int col){

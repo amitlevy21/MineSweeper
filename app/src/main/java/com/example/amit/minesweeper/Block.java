@@ -25,6 +25,9 @@ public class Block extends AppCompatButton{
         this.row = row;
         this.col = col;
     }
+    public void paintGray(){
+        setBackgroundResource(R.drawable.ic_frame);
+    }
     public int getRow() { return row; }
 
     public int getCol() { return col; }
