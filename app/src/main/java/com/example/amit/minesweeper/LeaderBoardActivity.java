@@ -12,13 +12,17 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LeaderBoardActivity extends AppCompatActivity {
 
@@ -26,6 +30,8 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
     private GoogleMap googleMap;
     private LeaderBoard leaderBoard;
+    private RadioGroup difficultyRadioGroup;
+    private TextView[][] leadersTextView;
 
 
     @Override
@@ -33,7 +39,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leader_board);
 
-        RadioGroup difficultyRadioGroup = (RadioGroup) findViewById(R.id.difficulty_radio_group);
+        difficultyRadioGroup = (RadioGroup) findViewById(R.id.difficulty_radio_group);
         difficultyRadioGroup.check(difficultyRadioGroup.getChildAt(0).getId());
 
 
@@ -66,7 +72,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //getCurrentLocation();
+
     }
 
     public boolean isGoogleMapsInstalled() {
@@ -100,8 +106,24 @@ public class LeaderBoardActivity extends AppCompatActivity {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !(context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
     }
     
-    public void loadLeaders() {
+    public void loadLeadersFromFireBase() {
         leaderBoard = LeaderBoard.getInstance();
-        // TODO: 9/11/2017  
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("Hello, World!");
+
+    }
+
+    public void showLeaders() {
+        int difficultyIndex = difficultyRadioGroup.getCheckedRadioButtonId();
+        ScrollView leaderContianer = (ScrollView) findViewById(R.id.leader_board_scroll_scores);
+
+
+        for (int i = 0; i < leadersTextView[difficultyIndex].length; i++) {
+            leaderContianer.addView(leadersTextView[difficultyIndex][i], i,
+                    new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
     }
 }
