@@ -39,6 +39,14 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="check"
+        android:layout_alignParentBottom="true"
+        android:textColor="#FFFFFFFF" />
+
+    <Button
         android:id="@+id/button_quit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

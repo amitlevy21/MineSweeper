@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Button start = (Button) findViewById(R.id.button_start);
         Button leaderBoard = (Button) findViewById(R.id.button_leader_board);
 
+
+
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 intent.putExtra(Keys.DIFFICULTY, difficulties[difficulty]);
                 intent.putExtra(Keys.BOARD_SIZE, BOARD_SIZE[difficulty]);
                 intent.putExtra(Keys.NUM_OF_MINES, NUM_OF_MINES[difficulty]);
-
-
 
                 showDifficulty = difficulties[difficulty].toString();
                 played = true;
