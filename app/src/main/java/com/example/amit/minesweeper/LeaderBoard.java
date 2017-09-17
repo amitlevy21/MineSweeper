@@ -49,7 +49,7 @@ public class LeaderBoard {
         else
             return false;
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+        DatabaseReference myRef = database.getReference("https://minesweeper-1504940334416.firebaseio.com/");
 
         myRef.setValue("Hello, World!");
         return true;

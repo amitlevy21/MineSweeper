@@ -228,7 +228,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
                 if (state.equals(Board.eState.LOSE)) {
                     mTilesFrameLayout.startAnimation();
-                    presentMainActivity(intent);
+                    presentEndGameActivity(intent);
                 } else { // WIN
 
                     leaderBoard = LeaderBoard.getInstance();
@@ -252,7 +252,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                             @Override
                             public void onDismiss(DialogInterface dialogInterface) {
                                 animateWin();
-                                presentMainActivity(intent);
+                                presentEndGameActivity(intent);
                             }
                         });
                         alertDialog.show();
@@ -323,7 +323,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         valueAnimator.start();
     }
 
-    private void presentMainActivity(final Intent intent) {
+    private void presentEndGameActivity(final Intent intent) {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -21,12 +22,22 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class LeaderBoardActivity extends AppCompatActivity {
 
     private static final String API_KEY = "AIzaSyCVyXqNtRzG5HYTbIJxUn0d_FoD-SGHNnM";
+    private static final String TAG = "amit";
 
     private GoogleMap googleMap;
     private LeaderBoard leaderBoard;
@@ -67,6 +78,8 @@ public class LeaderBoardActivity extends AppCompatActivity {
             mapsPlaceHolder.addView(errorMessageTextView);
         }
 
+       // loadLeadersFromFireBase();
+
     }
 
     @Override
@@ -105,19 +118,40 @@ public class LeaderBoardActivity extends AppCompatActivity {
         // Because the user's permissions started only from Android M and on...
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !(context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
     }
-    
+    /*
     public void loadLeadersFromFireBase() {
         leaderBoard = LeaderBoard.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
 
-        myRef.setValue("Hello, World!");
+        String[] difficulties = {"easy" , "medium", "hard"};
+        for (int i = 0; i < difficulties.length; i++) {
+            DatabaseReference myRef = database.getReference(difficulties[i]);
+            myRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    List<Map<String, String>> ranking = (List)dataSnapshot.getValue();
+
+                    for (int j = 1; j < ranking.size(); j++) {
+                        for (Map.Entry<String, String> leaderData: ranking.get(j).entrySet()) {
+                            Log.d(TAG, "key: " + leaderData.getKey() + "value: " + leaderData.getValue());
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
 
     }
-
+*/
     public void showLeaders() {
         int difficultyIndex = difficultyRadioGroup.getCheckedRadioButtonId();
         ScrollView leaderContianer = (ScrollView) findViewById(R.id.leader_board_scroll_scores);
+
 
 
         for (int i = 0; i < leadersTextView[difficultyIndex].length; i++) {
