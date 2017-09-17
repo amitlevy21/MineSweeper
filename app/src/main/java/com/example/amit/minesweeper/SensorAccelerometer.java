@@ -31,9 +31,14 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
     HandlerThread sensorThread;
     private Handler sensorHandler;
 
-    private float mAccel;
 
     PlayActivity pl;
+
+    private float[] mGravity;
+    private float mAccel = 0.00f;
+    private float mAccelCurrent = SensorManager.GRAVITY_EARTH;
+    ;
+    private float mAccelLast = SensorManager.GRAVITY_EARTH;
 
 
     @Override
@@ -69,17 +74,7 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(SENSOR_SERVICE_BROADCAST_ACTION);
 
-        //SomePojo somePojo = new SomePojo();
-        //somePojo.setName("parcelable POJO");
-        //somePojo.setLatitude(32.1151989);
-        //somePojo.setLongitude(34.8196429);
 
-        //broadcastIntent.putExtra(PARCEL_RECORD_KEY, somePojo);
-        //broadcastIntent.putExtra(SENSOR_SERVICE_VALUES_KEY, values);
-        //Log.v(getTag(), "Notifying new values: " + Arrays.toString(broadcastIntent.getFloatArrayExtra(SENSOR_SERVICE_VALUES_KEY)));
-        //sendBroadcast(broadcastIntent);
-
-        pl.updateBoard();
     }
 
     public float getValues() {
@@ -87,8 +82,9 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
     }
 
     /**
-     * Used to specify the tag of the actual running class (sometimes I chose to work with a mock)
-     * @return A String of the acting class's tag
+     * +     * Used to specify the tag of the actual running class (sometimes I chose to work with a mock)
+     * +     * @return A String of the acting class's tag
+     * +
      */
     public String getTag() {
         return TAG;
@@ -99,7 +95,6 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
     }
 
 
-
     @Override
     public void onSensorChanged(final SensorEvent event) {
         final float[] values = new float[event.values.length];
@@ -107,19 +102,26 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
             values[i] = event.values[i];// * 1000000.0f;
         }
 
-        notifyEvaluation(values);
+       /* float x = values[0];
+        float y = values[1];
+        float z =values[2];
+
+        mAccelLast = mAccelCurrent;
+        mAccelCurrent = (x*x + y*y + z*z);
+        float delta = mAccelCurrent - mAccelLast;
+        mAccel = mAccel * 0.9f + delta;
+        // Make this higher or lower according to how much
+        // motion you want to detect
+        if(mAccel > 3){
+            // do something
+        }*/
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    public class LocalBinder extends Binder {
-        SensorAccelerometer getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return SensorAccelerometer.this;
-        }
-    }
 
     class SensorServiceBinder extends Binder {
         static final String START_LISTENING = "Start";
@@ -150,111 +152,3 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*  private Context context;
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private TextView timelabel;
-    private Handler mHandler;
-    Runnable run;
-
-    private float mAccel;
-
-    public static boolean moved = false;
-
-    private float mLastX, mLastY, mLastZ;
-    private final float NOISE = (float) 3.0;
-
-
-   // private final IBinder mBinder = new SensorAccelerometer();
-    // Random number generator
-    private final Random mGenerator = new Random();
-
-
-    public class LocalBinder extends Binder {
-        SensorAccelerometer getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return SensorAccelerometer.this;
-        }
-    }
-
-    /** method for clients */
-   /* public int getRandomNumber() {
-        return mGenerator.nextInt(100);
-    }
-
-
-    public SensorAccelerometer() {
-        // TODO Auto-generated constructor stub
-        initialiseSensor();
-    }
-
-
-    public void initialiseSensor(){
-        sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ALL);
-        sensorManager.registerListener(this, accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    public void unregisterSensor(){
-        sensorManager.unregisterListener(this);
-        Toast.makeText(context, "Sensor Stopped..", Toast.LENGTH_SHORT).show();
-    }
-
-
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    public void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-        mAccel = SensorManager.GRAVITY_EARTH;
-        float mAccelCurrent = (float)Math.sqrt(x*x+y*y+z*z);
-        mAccel = mAccel * 0.9f + mAccelCurrent * 0.1f;
-
-        if(mAccel > 1){
-
-        }
-    }
-
-
-    @Override
-    public void onCreate() {
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return Service.START_NOT_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        return null;
-    }*/

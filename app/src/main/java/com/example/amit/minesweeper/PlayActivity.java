@@ -60,9 +60,6 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private Location currentLocation;
 
     ///////motion sensor
-    SensorAccelerometer mService;
-    boolean mBound = false;
-
     private boolean isServiceBound = false;
     public SensorAccelerometer.SensorServiceBinder binder;
 
@@ -80,6 +77,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         Bundle bundle = getIntent().getExtras();
         difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
 
+
         Button quit = (Button) findViewById(R.id.button_quit);
 
         quit.setOnClickListener(new View.OnClickListener() {
@@ -95,13 +93,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 intent.putExtra(Keys.GOOD_FLAGS,goodFlags);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-
-                ///////////sensor
-                if (mBound) {
-                    unbindService(mConnection);
-                    mBound = false;
-                }
-
+                unbindService(sensorsBoundServiceConnection);
 
                 startActivity(intent);
                 finish();
@@ -114,38 +106,36 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         mTilesFrameLayout = (TilesFrameLayout) findViewById(R.id.tiles_frame_layout);
         mTilesFrameLayout.setOnAnimationFinishedListener(this);
 
-
         Button check = (Button) findViewById(R.id.check);
+
+
+        Intent intent = new Intent(this, SensorAccelerometer.class);
+        bindService(intent, sensorsBoundServiceConnection, Context.BIND_AUTO_CREATE);
 
         check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 updateBoard();
+
             }
         });
 
-        /////////sensor
-        //Intent intent = new Intent(this, SensorAccelerometer.class);
-        bindService(new Intent(this, SensorAccelerometer.class), mConnection, Context.BIND_AUTO_CREATE);
-
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+
+    private ServiceConnection sensorsBoundServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            SensorAccelerometer.LocalBinder binder = (SensorAccelerometer.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
+            binder = (SensorAccelerometer.SensorServiceBinder) service;
+            isServiceBound = true;
             notifyBoundService(SensorAccelerometer.SensorServiceBinder.START_LISTENING);
-
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
+            isServiceBound = false;
         }
     };
 
@@ -155,17 +145,12 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         }
     }
 
-    ////////////UPDATE BOARD LOGIC
-    public void updateBoard(){
-        board.changeBoard();
-    }
-
 
     @Override
     protected void onResume() {
         super.onResume();
         mTilesFrameLayout.onResume();
-
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
     }
 
     @Override
@@ -190,6 +175,11 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         board.setBoardListener(this);
         return board;
     }
+
+    public void updateBoard() {
+        board.changeBoard();
+    }
+
 
     public int calculateButtonSize(MainActivity.eDifficulty difficulty) {
         Display display = getWindowManager().getDefaultDisplay();
@@ -265,19 +255,13 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 intent.putExtra(Keys.RESULT, state);
                 intent.putExtra(Keys.TIME, seconds);
 
+                ///////////sensor
+                unbindService(sensorsBoundServiceConnection);
+
 
                 intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
                 intent.putExtra(Keys.GOOD_FLAGS, numOfFlags);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-
-                //////////sensor
-                if (mBound) {
-                    unbindService(mConnection);
-                    mBound = false;
-                }
-
-
 
                 if (state.equals(Board.eState.LOSE)) {
                     mTilesFrameLayout.startAnimation();
@@ -390,6 +374,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     protected void onDestroy() {
         super.onDestroy();
         board.setBoardListener(null); // clear reference to the PlayActivity for garbage collector to clean
+        unbindService(sensorsBoundServiceConnection);
     }
 
     @Override
