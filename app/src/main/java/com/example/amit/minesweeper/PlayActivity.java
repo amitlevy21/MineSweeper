@@ -13,6 +13,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -39,8 +41,7 @@ import com.yalantis.starwars.TilesFrameLayout;
 import com.yalantis.starwars.interfaces.TilesFrameLayoutListener;
 
 
-
-public class PlayActivity extends AppCompatActivity implements Board.BoardListener, TilesFrameLayoutListener, LocationListener {
+public class PlayActivity extends AppCompatActivity implements Board.BoardListener, TilesFrameLayoutListener, LocationListener, SensorEventListener {
 
     public static final int BIGGER_FRACTION = 6;
     public static final int SMALLER_FRACTION = 12;
@@ -59,11 +60,13 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private boolean didAlreadyRequestLocationPermission;
     private Location currentLocation;
 
-    ///////motion sensor
-    private boolean isServiceBound = false;
-    public SensorAccelerometer.SensorServiceBinder binder;
+    float newPositionX, newPositionY, newPositionZ,
+            firstPositionX, firstPositionY, firstPositionZ,
+            calculatedX, calculatedY, calculatedZ;
+    boolean changed = false;
 
-
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
 
     private LeaderBoard leaderBoard;
     private MainActivity.eDifficulty difficulty;
@@ -76,6 +79,10 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
         Bundle bundle = getIntent().getExtras();
         difficulty = (MainActivity.eDifficulty) bundle.getSerializable(Keys.DIFFICULTY);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
 
         Button quit = (Button) findViewById(R.id.button_quit);
@@ -93,8 +100,6 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 intent.putExtra(Keys.GOOD_FLAGS,goodFlags);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-                unbindService(sensorsBoundServiceConnection);
-
                 startActivity(intent);
                 finish();
 
@@ -109,8 +114,9 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         Button check = (Button) findViewById(R.id.check);
 
 
-        Intent intent = new Intent(this, SensorAccelerometer.class);
-        bindService(intent, sensorsBoundServiceConnection, Context.BIND_AUTO_CREATE);
+        /*Intent intent = new Intent(this, SensorAccelerometer.class);
+        bindService(intent, sensorsBoundServiceConnection, Context.BIND_AUTO_CREATE);*/
+
 
         check.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +130,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     }
 
 
-    private ServiceConnection sensorsBoundServiceConnection = new ServiceConnection() {
+    /*private ServiceConnection sensorsBoundServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -137,14 +143,46 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
         public void onServiceDisconnected(ComponentName arg0) {
             isServiceBound = false;
         }
-    };
+    };*/
 
-    void notifyBoundService(String massageFromActivity) {
+    /*void notifyBoundService(String massageFromActivity) {
         if (isServiceBound && binder != null) {
             binder.notifyService(massageFromActivity);
         }
+    }*/
+
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (!(changed)) {
+            firstPositionX = sensorEvent.values[0];
+            firstPositionY = sensorEvent.values[1];
+            firstPositionZ = sensorEvent.values[2];
+            changed = true;
+        }
+        if (seconds % 5 == 0) {
+
+            if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                newPositionX = sensorEvent.values[0];
+                newPositionY = sensorEvent.values[1];
+                newPositionZ = sensorEvent.values[2];
+
+                calculatedX = (Math.abs(firstPositionX - newPositionX));
+                calculatedY = (Math.abs(firstPositionY - newPositionY));
+                calculatedZ = (Math.abs(firstPositionZ - newPositionZ));
+                if (calculatedX >= 5 || calculatedY >= 5 || calculatedZ >= 5) {
+                    updateBoard();
+                }
+            }
+        }
     }
 
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int a) {
+    }
 
     @Override
     protected void onResume() {
@@ -256,7 +294,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 intent.putExtra(Keys.TIME, seconds);
 
                 ///////////sensor
-                unbindService(sensorsBoundServiceConnection);
+               /* unbindService(sensorsBoundServiceConnection);*/
 
 
                 intent.putExtra(Keys.GOOD_CUBES, numOfPressedBlocks);
@@ -374,7 +412,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     protected void onDestroy() {
         super.onDestroy();
         board.setBoardListener(null); // clear reference to the PlayActivity for garbage collector to clean
-        unbindService(sensorsBoundServiceConnection);
+        //unbindService(sensorsBoundServiceConnection);
     }
 
     @Override

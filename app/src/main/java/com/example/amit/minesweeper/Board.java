@@ -133,7 +133,7 @@ public class Board {
     }
 
     public void changeBoard() {
-        int counter = 5;
+        int counter = 1;
         int mineCounter = 0;
         numOfPressedBlocks=0;
         for (int i = 0; i < blocks.length; i++) {
