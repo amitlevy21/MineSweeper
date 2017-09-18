@@ -54,6 +54,9 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     private int seconds = 0;
 
     private Board board;
+
+
+
     private TilesFrameLayout mTilesFrameLayout;
 
     private LocationManager locationManager;
@@ -126,6 +129,8 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
             }
         });
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        getCurrentLocation();
 
     }
 
@@ -309,6 +314,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                     leaderBoard = LeaderBoard.getInstance();
                     boolean leader = leaderBoard.isLeader(difficulty,numOfPressedBlocks);
                     if (leader) {
+
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
                         final EditText et = new EditText(this);
@@ -318,7 +324,8 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
                         alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                leaderBoard.addPlayer(difficulty,new PlayerScore(et.toString(),numOfPressedBlocks, currentLocation));
+                                leaderBoard.addPlayer(difficulty,new PlayerScore(et.toString(),numOfPressedBlocks, currentLocation, seconds),true);
+
                             }
                         });
 
@@ -331,6 +338,10 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                             }
                         });
                         alertDialog.show();
+                    }
+                    else {
+                        animateWin();
+                        presentEndGameActivity(intent);
                     }
                 }
             }
@@ -441,17 +452,16 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 isAccessGranted = true;
             }
 
-
-            if (currentLocation == null) {
-                currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-
-
             if (isAccessGranted) {
                 float metersToUpdate = 1;
                 long intervalMilliseconds = 1000;
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, intervalMilliseconds, metersToUpdate, this);
             }
+
+            if (currentLocation == null) {
+                currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+
         }
     }
 
@@ -475,4 +485,5 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
     public void onProviderDisabled(String s) {
 
     }
+
 }

@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Build;
+import android.support.annotation.IdRes;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,17 +19,20 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
@@ -42,7 +48,8 @@ public class LeaderBoardActivity extends AppCompatActivity {
     private GoogleMap googleMap;
     private LeaderBoard leaderBoard;
     private RadioGroup difficultyRadioGroup;
-    private TextView[][] leadersTextView;
+    private TextView[][] leadersTextView = new TextView[3][5];
+    private int[] numOfLeaderPerDifficulty = new int[3];
 
 
     @Override
@@ -53,6 +60,12 @@ public class LeaderBoardActivity extends AppCompatActivity {
         difficultyRadioGroup = (RadioGroup) findViewById(R.id.difficulty_radio_group);
         difficultyRadioGroup.check(difficultyRadioGroup.getChildAt(0).getId());
 
+        difficultyRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+                showLeaders();
+            }
+        });
 
         if (isGoogleMapsInstalled()) {
             // Add the Google Maps fragment dynamically
@@ -78,15 +91,11 @@ public class LeaderBoardActivity extends AppCompatActivity {
             mapsPlaceHolder.addView(errorMessageTextView);
         }
 
-       // loadLeadersFromFireBase();
+        loadLeadersFromFireBase();
+
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
 
     public boolean isGoogleMapsInstalled() {
         try {
@@ -118,25 +127,60 @@ public class LeaderBoardActivity extends AppCompatActivity {
         // Because the user's permissions started only from Android M and on...
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !(context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
     }
-    /*
+
     public void loadLeadersFromFireBase() {
         leaderBoard = LeaderBoard.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        String[] difficulties = {"easy" , "medium", "hard"};
+        final String[] difficulties = {"easy" , "medium", "hard"};
         for (int i = 0; i < difficulties.length; i++) {
             DatabaseReference myRef = database.getReference(difficulties[i]);
             myRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    List<Map<String, String>> ranking = (List)dataSnapshot.getValue();
+                    int difficultyIndex = getDifficultyIndex(difficulties, dataSnapshot);
+                    if(difficultyIndex != -1) {
+                        for (int rankIndex = 0; rankIndex < dataSnapshot.getChildrenCount(); rankIndex++) {
+                            DataSnapshot rank = dataSnapshot.child((rankIndex + 1) + "");
 
-                    for (int j = 1; j < ranking.size(); j++) {
-                        for (Map.Entry<String, String> leaderData: ranking.get(j).entrySet()) {
-                            Log.d(TAG, "key: " + leaderData.getKey() + "value: " + leaderData.getValue());
+                            //GenericTypeIndicator<Map<String,String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>(){};
+                            //Map<String, String> leader = rank.getValue(genericTypeIndicator); not working
+                            Map<String, String> leader = (Map<String, String>) rank.getValue();
+                            leadersTextView[difficultyIndex][rankIndex] = new TextView(getApplicationContext());
+                            //rank
+                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t " + rank.getKey() + "\t\t\t\t ");
+                            Iterator<Map.Entry<String,String>> leaderDetails = leader.entrySet().iterator();
+
+                            //name
+                            String name = leaderDetails.next().getValue();
+                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t\t\t " + name + "\t\t\t\t ");
+
+                            //score
+                            String score = leaderDetails.next().getValue();
+                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t " + score + "\t\t\t\t");
+
+                            //time
+                            String time = leaderDetails.next().getValue();
+                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t\t\t\t\t" + time + "\t\t\t\t ");
+
+                            //location
+                            double latitude = Double.parseDouble(leaderDetails.next().getValue());
+                            double longitude = Double.parseDouble(leaderDetails.next().getValue());
+
+
+                            googleMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)));
+
+                            Location location = new Location("");
+                            location.setLatitude(latitude);
+                            location.setLongitude(longitude);
+
+                            leaderBoard.addPlayer(MainActivity.eDifficulty.values()[difficultyIndex], new PlayerScore(name,Integer.parseInt(score),location, Integer.parseInt(time)), false);
+
+                            numOfLeaderPerDifficulty[difficultyIndex]++;
                         }
-                    }
 
+                        showLeaders();
+                    }
                 }
 
                 @Override
@@ -147,17 +191,34 @@ public class LeaderBoardActivity extends AppCompatActivity {
         }
 
     }
-*/
+
+    private int getDifficultyIndex(String[] difficulties, DataSnapshot dataSnapshot) {
+        for (int i = 0; i < difficulties.length; i++) {
+            if (difficulties[i].equals(dataSnapshot.getKey()))
+                return i;
+        }
+        return -1;
+    }
+
+
     public void showLeaders() {
-        int difficultyIndex = difficultyRadioGroup.getCheckedRadioButtonId();
-        ScrollView leaderContianer = (ScrollView) findViewById(R.id.leader_board_scroll_scores);
+        int difficultyIndex = difficultyRadioGroup.getCheckedRadioButtonId() - 1;
+        TableLayout tableLayout = (TableLayout) findViewById(R.id.leader_table);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.leader_board_scroll_scores);
+        scrollView.removeView(tableLayout);
+        tableLayout.removeAllViews();
+        scrollView.addView(tableLayout);
 
-
-
-        for (int i = 0; i < leadersTextView[difficultyIndex].length; i++) {
-            leaderContianer.addView(leadersTextView[difficultyIndex][i], i,
-                    new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
+        for (int i = 0; i < numOfLeaderPerDifficulty[difficultyIndex]; i++) {
+            TableRow tableRow = new TableRow(this);
+            tableRow.setLayoutParams(new TableLayout.LayoutParams(
+                    TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT));
+            leadersTextView[difficultyIndex][i].setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+            if(leadersTextView[difficultyIndex][i].getParent() != null)
+                ((TableRow)leadersTextView[difficultyIndex][i].getParent()).removeAllViews();
+            tableRow.addView(leadersTextView[difficultyIndex][i]);
+            tableLayout.addView(tableRow);
         }
     }
 }

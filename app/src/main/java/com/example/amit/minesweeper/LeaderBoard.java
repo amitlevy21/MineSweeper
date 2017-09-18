@@ -32,26 +32,37 @@ public class LeaderBoard {
             return true;
     }
 
-    public boolean addPlayer(MainActivity.eDifficulty difficulty, PlayerScore playerScore) {
+    public boolean addPlayer(MainActivity.eDifficulty difficulty, PlayerScore playerScore, boolean addToDataBase) {
         int difficultyIndex = difficulty.ordinal();
         int i = 0;
-        while(i < currentNumOfLeaders[difficultyIndex] && playerScores[difficultyIndex][i].getScore() >= playerScore.getScore()) {
+        while (i < currentNumOfLeaders[difficultyIndex] && playerScores[difficultyIndex][i].getScore() >= playerScore.getScore()) {
             i++;
         }
-        if(i < currentNumOfLeaders[difficultyIndex]) {
-            if(i == playerScores[difficultyIndex].length - 1)
+        if (i < currentNumOfLeaders[difficultyIndex]) {
+            if (i == playerScores[difficultyIndex].length - 1)
                 playerScores[difficultyIndex][i] = playerScore;
-            else{
+            else {
                 playerScores[difficultyIndex][i + 1] = playerScores[difficultyIndex][i];
                 playerScores[difficultyIndex][i] = playerScore;
             }
-        }
-        else
+        } else
             return false;
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("https://minesweeper-1504940334416.firebaseio.com/");
+        //get difficulty ref
+        DatabaseReference myRef = database.getReference(difficulty.name().toLowerCase());
+        if (myRef.child("" + (i + 1)) == null) { // entry  doesn't exist in firebase
+            myRef.setValue("" + (i + 1));
+        }
 
-        myRef.setValue("Hello, World!");
+        DatabaseReference refChild = myRef.child("" + (i + 1));
+
+        if(addToDataBase) {
+            refChild.setValue(playerScore.getName());
+            refChild.setValue(playerScore.getScore());
+            refChild.setValue(playerScore.getTimeInSecond());
+            refChild.setValue(playerScore.getLocation().getLatitude());
+            refChild.setValue(playerScore.getLocation().getLongitude());
+        }
         return true;
     }
 }
