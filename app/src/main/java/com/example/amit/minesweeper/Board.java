@@ -129,11 +129,10 @@ public class Board {
                 blocks[i][j].setNumOfMinesAround(mines);
             }
         }
-
     }
 
     public void changeBoard() {
-        int counter = 1;
+        int counter = 3;
         int mineCounter = 0;
         numOfPressedBlocks=0;
         for (int i = 0; i < blocks.length; i++) {

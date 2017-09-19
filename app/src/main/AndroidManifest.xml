@@ -15,7 +15,8 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCVyXqNtRzG5HYTbIJxUn0d_FoD-SGHNnM"/>
+            android:value="AIzaSyCVyXqNtRzG5HYTbIJxUn0d_FoD-SGHNnM" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,9 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PlayActivity" android:noHistory="true" />
+        <activity
+            android:name=".PlayActivity"
+            android:noHistory="true" />
         <activity android:name=".EndGameActivity" />
         <activity android:name=".LeaderBoardActivity" />
+
+        <service
+            android:name=".SensorAccelerometer"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

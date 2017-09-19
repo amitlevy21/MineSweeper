@@ -12,34 +12,24 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
-import java.util.Random;
 
 public class SensorAccelerometer extends Service implements SensorEventListener {
-    public static final String SENSOR_SERVICE_BROADCAST_ACTION = "SENSOR_SERVICE_BROADCAST_ACTION";
-    public static final String SENSOR_SERVICE_VALUES_KEY = "SENSOR_SERVICE_VALUES_KEY";
-    public static final String PARCEL_RECORD_KEY = "record";
 
     private static final String TAG = SensorAccelerometer.class.getSimpleName();
-    protected SensorServiceBinder sensorServiceBinder = new SensorServiceBinder();// An IBinder implementation subclass
-    protected float values;
+    protected SensorAccelerometer.SensorServiceBinder sensorServiceBinder = new SensorAccelerometer.SensorServiceBinder();// An IBinder implementation subclass
     private SensorManager sensorManager;
     boolean isListening = false;
     HandlerThread sensorThread;
     private Handler sensorHandler;
 
+    float newPositionX, newPositionY, newPositionZ,
+            firstPositionX, firstPositionY, firstPositionZ,
+            calculatedX, calculatedY, calculatedZ;
+    boolean changed = false;
 
-    PlayActivity pl;
-
-    private float[] mGravity;
-    private float mAccel = 0.00f;
-    private float mAccelCurrent = SensorManager.GRAVITY_EARTH;
-    ;
-    private float mAccelLast = SensorManager.GRAVITY_EARTH;
-
+    boolean shouldUpdate = false;
 
     @Override
     public void onCreate() {
@@ -52,11 +42,13 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     }
 
+    public SensorAccelerometer() {
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         sensorServiceBinder.sensorService = this;
 
-        // A.D: "You must always implement this method, but if you don't want to allow binding, then you should return null."
         return sensorServiceBinder;
     }
 
@@ -70,85 +62,66 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
         return super.onUnbind(intent);
     }
 
-    protected void notifyEvaluation(float[] values) {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(SENSOR_SERVICE_BROADCAST_ACTION);
-
-
-    }
-
-    public float getValues() {
-        return values;
-    }
-
-    /**
-     * +     * Used to specify the tag of the actual running class (sometimes I chose to work with a mock)
-     * +     * @return A String of the acting class's tag
-     * +
-     */
     public String getTag() {
         return TAG;
     }
 
-    public SensorAccelerometer getSelf() {
-        return this;
-    }
-
-
     @Override
     public void onSensorChanged(final SensorEvent event) {
-        final float[] values = new float[event.values.length];
-        for (int i = 0; i < event.values.length; i++) {
-            values[i] = event.values[i];// * 1000000.0f;
+
+        if (!(changed)) {
+            firstPositionX = event.values[0];
+            firstPositionY = event.values[1];
+            firstPositionZ = event.values[2];
+            changed = true;
         }
+        newPositionX = event.values[0];
+        newPositionY = event.values[1];
+        newPositionZ = event.values[2];
 
-       /* float x = values[0];
-        float y = values[1];
-        float z =values[2];
-
-        mAccelLast = mAccelCurrent;
-        mAccelCurrent = (x*x + y*y + z*z);
-        float delta = mAccelCurrent - mAccelLast;
-        mAccel = mAccel * 0.9f + delta;
-        // Make this higher or lower according to how much
-        // motion you want to detect
-        if(mAccel > 3){
-            // do something
-        }*/
+        calculatedX = (Math.abs(firstPositionX - newPositionX));
+        calculatedY = (Math.abs(firstPositionY - newPositionY));
+        calculatedZ = (Math.abs(firstPositionZ - newPositionZ));
+        if (calculatedX > 3 || calculatedY > 3 || calculatedZ > 3)
+            shouldUpdate = true;
+        else
+            shouldUpdate = false;
     }
-
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-
     class SensorServiceBinder extends Binder {
         static final String START_LISTENING = "Start";
         private SensorAccelerometer sensorService;
+
+        boolean update() {
+            if (shouldUpdate)
+                return true;
+            return false;
+        }
 
         SensorAccelerometer getService() {
             return sensorService;
         }
 
         void notifyService(String msg) {
-            // A.D: "you must provide an interface that clients use to communicate with the service, by returning an IBinder."
+
             Log.v(getTag(), SensorAccelerometer.class.getSimpleName() + " has got a message from its binding activity. Message: " + msg);
 
-            if (msg == SensorServiceBinder.START_LISTENING && !isListening) { // Why can we
+            if (msg == SensorAccelerometer.SensorServiceBinder.START_LISTENING && !isListening) {
                 List<Sensor> sensorList= sensorManager.getSensorList(Sensor.TYPE_ALL);
                 Log.v(getTag(), "Available sensors: " + sensorList);
-                Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER); // Sensor.TYPE_GYROSCOPE will be null in Genymotion free edition
+                Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                 if (sensor == null && sensorList.size() > 0) {
-                    // Backup
-                    sensor = sensorList.get(0); // for Genymotion sensors (Genymotion Accelerometer in my case)
+                    sensor = sensorList.get(0);
                 }
-
                 if (sensor == null) return;
-
                 sensorManager.registerListener(getService(), sensor, SensorManager.SENSOR_DELAY_UI, sensorHandler);
                 isListening = true;
             }
         }
     }
 }
+
