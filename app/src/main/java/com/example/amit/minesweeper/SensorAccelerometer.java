@@ -96,6 +96,8 @@ public class SensorAccelerometer extends Service implements SensorEventListener 
         static final String START_LISTENING = "Start";
         private SensorAccelerometer sensorService;
 
+
+        //////notify PlayActivity if the board should be updated
         boolean update() {
             if (shouldUpdate)
                 return true;
