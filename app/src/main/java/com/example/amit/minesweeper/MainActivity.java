@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         difficultySpinner.setOnItemSelectedListener(this);
 
         Button start = (Button) findViewById(R.id.button_start);
-        Button leaderBoard = (Button) findViewById(R.id.button_leader_board);
+        Button leaderBoardButton = (Button) findViewById(R.id.button_leader_board);
 
 
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        leaderBoard.setOnClickListener(new View.OnClickListener() {
+        leaderBoardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             difficultyPlayed.setText(getString(R.string.last_mode_played) + " " + showDifficulty);
         }
         askPermissions();
-    }
+        }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {

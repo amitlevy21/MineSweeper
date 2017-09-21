@@ -265,7 +265,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
                 } else { // WIN
 
                     leaderBoard = LeaderBoard.getInstance();
-                    boolean leader = leaderBoard.isLeader(difficulty,numOfPressedBlocks);
+                    boolean leader = leaderBoard.isLeader(difficulty, seconds);
                     if (leader) {
 
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -277,7 +277,7 @@ public class PlayActivity extends AppCompatActivity implements Board.BoardListen
 
                         alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                leaderBoard.addPlayer(difficulty,new PlayerScore(et.toString(),numOfPressedBlocks, currentLocation, seconds),true);
+                                leaderBoard.addPlayer(difficulty,new PlayerScore(et.toString(), currentLocation, seconds),true);
 
                             }
                         });

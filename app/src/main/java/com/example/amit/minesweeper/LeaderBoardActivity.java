@@ -3,20 +3,21 @@ package com.example.amit.minesweeper;
 import android.Manifest;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
-import android.support.v7.app.ActionBar;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -35,21 +36,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class LeaderBoardActivity extends AppCompatActivity {
 
-    private static final String API_KEY = "AIzaSyCVyXqNtRzG5HYTbIJxUn0d_FoD-SGHNnM";
-    private static final String TAG = "amit";
+
+    
 
     private GoogleMap googleMap;
     private LeaderBoard leaderBoard;
     private RadioGroup difficultyRadioGroup;
     private TextView[][] leadersTextView = new TextView[3][5];
     private int[] numOfLeaderPerDifficulty = new int[3];
+    private SharedPreferences prefs;
 
 
     @Override
@@ -78,6 +78,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     setGoogleMap(googleMap);
+                    loadLeadersFromFireBase();
                 }
             });
         } else {
@@ -91,11 +92,10 @@ public class LeaderBoardActivity extends AppCompatActivity {
             mapsPlaceHolder.addView(errorMessageTextView);
         }
 
-        loadLeadersFromFireBase();
+
 
 
     }
-
 
     public boolean isGoogleMapsInstalled() {
         try {
@@ -108,12 +108,10 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
     public void setGoogleMap(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        //googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE); // Unmark to see the changes...
 
         boolean isAllowedToUseLocation = hasPermissionForLocationServices(getApplicationContext());
         if (isAllowedToUseLocation) {
             try {
-                // Allow to (try to) set
                 googleMap.setMyLocationEnabled(true);
             } catch (SecurityException exception) {
                 Toast.makeText(this, "Error getting location" , Toast.LENGTH_SHORT).show();
@@ -132,7 +130,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
         leaderBoard = LeaderBoard.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        final String[] difficulties = {"easy" , "medium", "hard"};
+        final String[] difficulties = {"easy", "medium", "hard"};
         for (int i = 0; i < difficulties.length; i++) {
             DatabaseReference myRef = database.getReference(difficulties[i]);
             myRef.addValueEventListener(new ValueEventListener() {
@@ -148,20 +146,16 @@ public class LeaderBoardActivity extends AppCompatActivity {
                             Map<String, String> leader = (Map<String, String>) rank.getValue();
                             leadersTextView[difficultyIndex][rankIndex] = new TextView(getApplicationContext());
                             //rank
-                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t " + rank.getKey() + "\t\t\t\t ");
+                            leadersTextView[difficultyIndex][rankIndex].append(rank.getKey() + " ");
                             Iterator<Map.Entry<String,String>> leaderDetails = leader.entrySet().iterator();
 
                             //name
                             String name = leaderDetails.next().getValue();
-                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t\t\t " + name + "\t\t\t\t ");
-
-                            //score
-                            String score = leaderDetails.next().getValue();
-                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t " + score + "\t\t\t\t");
+                            leadersTextView[difficultyIndex][rankIndex].append(name + " ");
 
                             //time
                             String time = leaderDetails.next().getValue();
-                            leadersTextView[difficultyIndex][rankIndex].append("\t\t\t\t\t\t\t\t" + time + "\t\t\t\t ");
+                            leadersTextView[difficultyIndex][rankIndex].append(time + " ");
 
                             //location
                             double latitude = Double.parseDouble(leaderDetails.next().getValue());
@@ -174,13 +168,17 @@ public class LeaderBoardActivity extends AppCompatActivity {
                             location.setLatitude(latitude);
                             location.setLongitude(longitude);
 
-                            leaderBoard.addPlayer(MainActivity.eDifficulty.values()[difficultyIndex], new PlayerScore(name,Integer.parseInt(score),location, Integer.parseInt(time)), false);
+                            prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            if(!prefs.getBoolean("firstTime", false)) {
+                                leaderBoard.addPlayer(MainActivity.eDifficulty.values()[difficultyIndex], new PlayerScore(name, location, Integer.parseInt(time)), false);
+                            }
 
                             numOfLeaderPerDifficulty[difficultyIndex]++;
                         }
 
-                        showLeaders();
+
                     }
+                    showLeaders();
                 }
 
                 @Override
@@ -189,6 +187,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
                 }
             });
         }
+
 
     }
 
@@ -202,7 +201,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
 
     public void showLeaders() {
-        int difficultyIndex = difficultyRadioGroup.getCheckedRadioButtonId() - 1;
+        int difficultyIndex = ((difficultyRadioGroup.getCheckedRadioButtonId() - 1) % 3);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.leader_table);
         ScrollView scrollView = (ScrollView) findViewById(R.id.leader_board_scroll_scores);
         scrollView.removeView(tableLayout);
@@ -210,15 +209,39 @@ public class LeaderBoardActivity extends AppCompatActivity {
         scrollView.addView(tableLayout);
 
         for (int i = 0; i < numOfLeaderPerDifficulty[difficultyIndex]; i++) {
+            String[] leaderDetails = leadersTextView[difficultyIndex][i].getText().toString().split(" ");
             TableRow tableRow = new TableRow(this);
-            tableRow.setLayoutParams(new TableLayout.LayoutParams(
-                    TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT));
-            leadersTextView[difficultyIndex][i].setLayoutParams(new TableRow.LayoutParams(
-                    TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-            if(leadersTextView[difficultyIndex][i].getParent() != null)
-                ((TableRow)leadersTextView[difficultyIndex][i].getParent()).removeAllViews();
-            tableRow.addView(leadersTextView[difficultyIndex][i]);
-            tableLayout.addView(tableRow);
+            for (int j = 0; j < leaderDetails.length; j++) {
+
+                tableRow.setLayoutParams(new TableLayout.LayoutParams(
+                        TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
+                //leadersTextView[difficultyIndex][i].setLayoutParams(new TableRow.LayoutParams(
+                //TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                if(leadersTextView[difficultyIndex][i].getParent() != null)
+                    ((TableRow)leadersTextView[difficultyIndex][i].getParent()).removeAllViews();
+
+                //tableRow.addView(leadersTextView[difficultyIndex][i]);
+                TextView stringToView = new TextView(this);
+                stringToView.setText(leaderDetails[j]);
+                tableRow.addView(stringToView, j);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1f);
+                lp.setMargins(10, 0, 0, 10);
+                stringToView.setLayoutParams(lp);
+
+
+            }
+            tableLayout.addView(tableRow, i);
+
         }
+        
+        
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("firstTime", true);
+        editor.commit();
     }
 }
