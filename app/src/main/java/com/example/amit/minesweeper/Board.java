@@ -133,7 +133,7 @@ public class Board {
 
     public void changeBoard() {
         int counter = 3;
-        int mineCounter = 0;
+        numOfMines = 0;
         numOfPressedBlocks=0;
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[i].length; j++) {
@@ -142,16 +142,16 @@ public class Board {
                     blocks[i][j].paintGray();
                 }
                 else if (blocks[i][j].hasMine())
-                    mineCounter++;
+                    numOfMines++;
             }
         }
-        while (counter != 0 && ((mineCounter) < (blocks.length * blocks.length))) {
+        while (counter != 0 && ((numOfMines) < (blocks.length * blocks.length))) {
             Random r = new Random();
             int row = r.nextInt(blocks.length);
             int col = r.nextInt(blocks.length);
             if (addMines(row, col)) {
                 counter--;
-                mineCounter++;
+                numOfMines++;
             }
         }
         updateNumOfMinesAround();
